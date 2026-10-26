@@ -5,6 +5,8 @@ uma interface inspirada em *Stardew Valley*. Ele apresenta informações
 técnicas usando elementos visuais de fazenda, pixel art, placas de
 madeira e pergaminhos.
 
+⚙ Acesse em tempo Real: https://stardewmonitor.onrender.com
+
 ## 📌 Objetivo
 
 O site organiza informações de uso do sistema em um painel temático,
