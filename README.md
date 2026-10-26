@@ -1,102 +1,133 @@
 # 🌾 Stardew Monitor
 
-Monitor de recursos do sistema Linux com tema **Stardew Valley**, feito em Shell Script (Bash) para a disciplina de Sistemas Operacionais.
+O **Stardew Monitor** é um painel web de monitoramento de sistema com
+uma interface inspirada em *Stardew Valley*. Ele apresenta informações
+técnicas usando elementos visuais de fazenda, pixel art, placas de
+madeira e pergaminhos.
 
-## Objetivo e problema
+## 📌 Objetivo
 
-Acompanhar o uso de CPU, memória e disco e gerenciar processos pelo terminal costuma ser pouco amigável. O Stardew Monitor traduz esses dados para a linguagem da fazenda e entrega relatórios, logs e backups automatizados.
+O site organiza informações de uso do sistema em um painel temático,
+facilitando a visualização de recursos, processos em execução e
+mensagens de status.
 
-| Recurso do Linux | Na fazenda | Fonte dos dados |
-|---|---|---|
-| CPU | ⚡ Energia (100% − uso de CPU) | `/proc/stat` |
-| Memória RAM | 🎒 Mochila (36 espaços) | `/proc/meminfo` |
-| Disco | 🏚️ Silo | `df` |
-| Processos | 🏘️ Moradores de Pelican Town | `ps` |
-| Arquivo de log | 📖 Diário da Fazenda | `diario.log` |
-| Backup | 📦 Celeiro | `tar` |
-| Processo iniciado/encerrado | 🧑‍🌾 Trabalhador contratado/dispensado | `nohup`, `kill` |
+## 🖥️ O que aparece no painel
 
-## Tecnologias
+### 1. Cena da fazenda
 
-Bash, utilitários GNU/Linux (`ps`, `df`, `tar`, `awk`, `kill`, `cron`), Git e GitHub.
+Uma ilustração em pixel art com casa, árvores, plantações, espantalho,
+galinhas, flores e céu. Ela serve como elemento visual central do tema.
 
-## Conceitos de Sistemas Operacionais aplicados
+### 2. Data e localização
 
-1. **Gerenciamento de processos**: `processos` lista processos com `ps`. `contratar` inicia um processo em segundo plano com `nohup`. `dispensar` o encerra com sinais (`SIGTERM`, depois `SIGKILL` se necessário).
-2. **CPU e memória**: lê `/proc/stat` duas vezes com 1 s de intervalo para calcular o uso real de CPU, e `/proc/meminfo` para a RAM.
-3. **Armazenamento e disco**: `df` informa o uso do disco e `backup` compacta arquivos com rotação dos mais antigos.
-4. **Arquivos, diretórios e permissões**: a pasta de dados é criada com `chmod 700` e os relatórios com `chmod 600`.
-5. **Variáveis de ambiente**: `FAZENDA_DIR`, `BAU_DIR`, `ALERTA_CPU`, `ALERTA_RAM`, `ALERTA_DISCO` e `MANTER_BACKUPS` configuram o comportamento.
-6. **Registro de informações operacionais**: toda ação grava uma linha com data e nível no `diario.log`.
-7. **Agendamento de tarefas**: `scripts/setup.sh --cron` instala uma entrada no `cron`.
+Uma placa exibe informações de data, horário e nome da fazenda.
 
-Escolhemos esses conceitos porque são os que um administrador de sistemas usa no dia a dia, e porque cada um tem um resultado visível na demonstração.
+### 3. Recursos da fazenda
 
-## Funcionalidades
+O painel mostra três indicadores em formato de barras:
 
-- `status`: barras de Energia, Mochila e Silo com alertas ("Você está exausto!")
-- `processos [N]`: top N processos por CPU
-- `relatorio`: relatório em Markdown
-- `backup`: backup `.tar.gz` do baú com rotação
-- `contratar <cmd>` / `dispensar <pid>` / `trabalhadores`: ciclo de vida controlado de processos
-- `historico [N]`: consulta o diário (log)
+-   **Energia:** exibe uma porcentagem e um indicador de uso da CPU.
+-   **Mochila:** representa o uso da memória RAM, com quantidade
+    utilizada e percentual.
+-   **Silo:** representa o armazenamento em disco, mostrando espaço
+    utilizado e capacidade total.
 
-## Instalação e execução
+As cores das barras distinguem estados visuais, como normal, atenção e
+alerta.
 
-Requisitos: Linux com Bash 4+ e utilitários padrão (`ps`, `df`, `tar`, `awk`).
+### 4. Mensagem de status
 
-```bash
-git clone https://github.com/<usuario>/stardew-monitor.git
-cd stardew-monitor
-./scripts/setup.sh          # dá permissão de execução e prepara os diretórios
-./stardew-monitor.sh status
-```
+Um cartão apresenta uma mensagem sobre a situação geral da
+fazenda/sistema.
 
-Comandos de exemplo:
+### 5. Moradores de Pelican Town
 
-```bash
-./stardew-monitor.sh processos 5
-./stardew-monitor.sh relatorio
-./stardew-monitor.sh backup
-./stardew-monitor.sh contratar sleep 300     # mostra o PID
-./stardew-monitor.sh trabalhadores
-./stardew-monitor.sh dispensar <PID>
-./stardew-monitor.sh historico 10
-```
+Uma tabela apresenta informações de processos do sistema:
 
-Os dados gerados ficam em `~/.stardew-monitor/` (ou em `$FAZENDA_DIR`).
+-   **PID:** identificador do processo.
+-   **Usuário:** usuário associado ao processo.
+-   **CPU:** percentual de processamento utilizado.
+-   **MEM:** percentual de memória utilizado.
+-   **Processo:** nome do processo em execução.
 
-## Scripts e automação
+### 6. Diário da fazenda
 
-- `scripts/setup.sh`: prepara o ambiente. Com `--cron`, agenda um relatório diário às 08:00.
-- `scripts/backup-diario.sh`: gera relatório e backup em sequência, pronto para o cron.
-- Exemplo manual de cron: `0 2 * * * /caminho/stardew-monitor/scripts/backup-diario.sh`
+Uma área de texto destinada a anotações. Quando está vazia, exibe a
+mensagem "Nenhuma anotação hoje...".
 
-## Como testar
+### 7. Rodapé
 
-```bash
-./tests/test.sh
-```
+Mostra a data e o horário da última atualização informada no painel.
 
-Os 10 testes verificam o status, o log, as permissões, os processos, o relatório, o backup (com rotação) e o ciclo de vida de um processo. Eles usam um diretório temporário e não alteram seus dados.
+## 🧰 Tecnologias utilizadas
 
-Para verificar na demonstração, estressando a CPU e acompanhando a Energia cair:
+-   **HTML5:** estrutura e organização do conteúdo.
+-   **CSS3:** cores, layout, cartões, barras de recursos, responsividade
+    e animações.
+-   **SVG:** criação da cena da fazenda em pixel art diretamente no
+    documento.
+-   **Google Fonts:** fontes `Press Start 2P` e `VT323`, usadas para
+    reforçar a estética retrô.
 
-```bash
-./stardew-monitor.sh contratar sh -c 'while :; do :; done'
-./stardew-monitor.sh status          # Energia cai
-./stardew-monitor.sh dispensar <PID>
-./stardew-monitor.sh status          # Energia volta
-```
+O arquivo contém HTML e CSS no mesmo documento (`Painel Stardew.html`),
+sem uma estrutura de projeto separada visível no arquivo analisado.
 
-Para forçar um alerta: `ALERTA_RAM=0 ./stardew-monitor.sh status`.
+## 🎨 Identidade visual
 
-## Limitações conhecidas
+O visual combina elementos de jogos retrô com uma paleta inspirada em
+madeira, pergaminho, vegetação e ouro. As bordas espessas, sombras,
+fontes pixeladas e animações discretas reforçam a aparência de um painel
+de jogo.
 
-- Só funciona em Linux (depende de `/proc`).
-- O `status` leva cerca de 1 segundo para medir a CPU.
-- O `dispensar` só encerra processos contratados pelo próprio programa, por segurança.
-- O Stardew Valley é marca de ConcernedApe. Este projeto é acadêmico e não tem fins comerciais.
+O layout também inclui regras para telas menores, reorganizando os
+indicadores e os cartões para melhorar a leitura em dispositivos
+estreitos. Há ainda uma configuração para desativar algumas animações
+quando o sistema do usuário prefere movimento reduzido.
 
+## 🔄 Atualização automática
 
-```
+O documento contém uma configuração HTML para recarregar a página a cada
+**5 segundos**.
+
+**Importante:** o recarregamento, por si só, não coleta nem atualiza
+dados do sistema. No arquivo analisado, os valores exibidos estão
+escritos diretamente no HTML e não há código JavaScript visível que os
+consulte automaticamente. Para mostrar métricas reais e atualizadas, o
+painel precisa receber dados de uma fonte externa, como um serviço ou
+uma API que obtenha as informações do sistema.
+
+## 🚀 Como abrir
+
+1.  Salve o arquivo `Painel Stardew.html` no computador.
+2.  Abra o arquivo em um navegador moderno, como Chrome, Firefox ou
+    Edge.
+3.  O painel será exibido no navegador.
+
+Como o arquivo inclui sua própria estrutura e estilos, não é necessário
+compilar o HTML para visualizar a interface. É necessária uma conexão
+com a internet para carregar as fontes hospedadas no Google Fonts; caso
+contrário, o navegador usará as fontes alternativas definidas no CSS.
+
+## 📁 Estrutura do arquivo
+
+O arquivo está organizado em partes principais:
+
+-   **Cabeçalho (`head`):** define codificação, configuração para
+    dispositivos móveis, título, fontes e estilos CSS.
+-   **Corpo (`body`):** contém o título do painel, a ilustração SVG, os
+    indicadores de recursos, a tabela de processos, o diário e o rodapé.
+-   **CSS embutido:** controla a aparência, as cores, o posicionamento,
+    as animações e os ajustes para telas menores.
+
+## ⚠️ Observação sobre os dados
+
+Os números e nomes mostrados no painel são os valores presentes no HTML
+analisado. Não devem ser considerados métricas em tempo real apenas
+porque a página recarrega automaticamente. Para transformar o projeto em
+um monitor funcional, será necessário conectar os componentes visuais a
+uma fonte que forneça dados reais.
+
+------------------------------------------------------------------------
+
+*Stardew Monitor --- monitoramento de sistema com clima de fazenda e
+estética pixel art.*
