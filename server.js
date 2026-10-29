@@ -9,6 +9,9 @@ const PORT = process.env.PORT || 3000;
 const TIMEZONE = process.env.TZ_NAME || 'America/Sao_Paulo';
 const TEMPLATE = fs.readFileSync(path.join(__dirname, 'template.html'), 'utf8');
 
+const TAREFAS_FILE = path.join(process.env.DATA_DIR || __dirname, 'tarefas.json');
+const MAX_TAREFAS = 30;
+
 const ESTACOES = ['Primavera', 'Verão', 'Outono', 'Inverno'];
 
 // ---------- utilidades ----------
@@ -43,6 +46,58 @@ let ultimoNivel = 'ok';
 function anotar(msg) {
   diario.push(`[${dataLocal().hora}] ${msg}`);
   if (diario.length > 8) diario.shift();
+}
+
+// ---------- quadro de missões (tarefas) ----------
+function carregarTarefas() {
+  try {
+    const db = JSON.parse(fs.readFileSync(TAREFAS_FILE, 'utf8'));
+    return { dia: db.dia || '', itens: Array.isArray(db.itens) ? db.itens : [] };
+  } catch {
+    return { dia: '', itens: [] };
+  }
+}
+
+function salvarTarefas(db) {
+  const tmp = TAREFAS_FILE + '.tmp';
+  fs.writeFileSync(tmp, JSON.stringify(db, null, 2));
+  fs.renameSync(tmp, TAREFAS_FILE); // escrita atômica
+}
+
+// Reseta as tarefas diárias quando vira o dia
+function tarefasDoDia() {
+  const db = carregarTarefas();
+  const hoje = dataLocal().completo.slice(0, 10);
+  if (db.dia !== hoje) {
+    db.itens.forEach((t) => { if (t.diaria) t.feita = false; });
+    db.dia = hoje;
+    salvarTarefas(db);
+  }
+  return db;
+}
+
+function renderTarefas() {
+  const { itens } = tarefasDoDia();
+  const lista = itens.map((t) => `
+    <li class="${t.feita ? 'feita' : ''}">
+      <form method="post" action="/tarefas/${esc(t.id)}/toggle">
+        <button class="check" title="Marcar/desmarcar">${t.feita ? '☑' : '☐'}</button>
+      </form>
+      <span class="texto">${esc(t.texto)}${t.diaria ? ' <small>(diária)</small>' : ''}</span>
+      <form method="post" action="/tarefas/${esc(t.id)}/apagar">
+        <button class="apagar" title="Apagar">✕</button>
+      </form>
+    </li>`).join('');
+
+  const feitas = itens.filter((t) => t.feita).length;
+  return `
+    <p class="progresso">${feitas}/${itens.length} concluídas</p>
+    <ul class="tarefas">${lista || '<li class="vazio">Nenhuma missão. Que tal plantar algo?</li>'}</ul>
+    <form class="nova" method="post" action="/tarefas">
+      <input name="texto" maxlength="80" placeholder="Nova tarefa..." required>
+      <label><input type="checkbox" name="diaria"> diária</label>
+      <button>Adicionar</button>
+    </form>`;
 }
 
 // ---------- coleta de dados ----------
@@ -106,6 +161,7 @@ function render(d) {
     MENSAGEM: MENSAGENS[geral],
     PROCESSOS: linhas,
     DIARIO: esc(diario.join('\n')),
+    TAREFAS: renderTarefas(),
     ATUALIZADO: t.completo,
   };
 
@@ -114,6 +170,7 @@ function render(d) {
 
 // ---------- rotas ----------
 app.disable('x-powered-by');
+app.use(express.urlencoded({ extended: false, limit: '4kb' }));
 
 app.get('/health', (_req, res) => res.send('ok'));
 
@@ -124,6 +181,35 @@ app.get('/', async (_req, res) => {
     console.error(e);
     res.status(500).send('Erro ao coletar dados da fazenda.');
   }
+});
+
+app.post('/tarefas', (req, res) => {
+  const texto = String(req.body.texto || '').trim().slice(0, 80);
+  const db = tarefasDoDia();
+  if (texto && db.itens.length < MAX_TAREFAS) {
+    db.itens.push({
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
+      texto,
+      feita: false,
+      diaria: req.body.diaria === 'on',
+    });
+    salvarTarefas(db);
+  }
+  res.redirect(303, '/');
+});
+
+app.post('/tarefas/:id/toggle', (req, res) => {
+  const db = tarefasDoDia();
+  const t = db.itens.find((x) => x.id === req.params.id);
+  if (t) { t.feita = !t.feita; salvarTarefas(db); }
+  res.redirect(303, '/');
+});
+
+app.post('/tarefas/:id/apagar', (req, res) => {
+  const db = tarefasDoDia();
+  db.itens = db.itens.filter((x) => x.id !== req.params.id);
+  salvarTarefas(db);
+  res.redirect(303, '/');
 });
 
 app.listen(PORT, '0.0.0.0', () => console.log(`Stardew Monitor rodando na porta ${PORT}`));
