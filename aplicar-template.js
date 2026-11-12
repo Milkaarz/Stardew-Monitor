@@ -16,6 +16,15 @@ const CSS = `
 .somfix button:active{transform:translateY(2px)}
 .somfix button:focus-visible{outline:3px solid var(--ouro);outline-offset:2px}
 @media(max-width:700px){body{padding-top:58px}}
+.fundo{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+.fundo svg{position:absolute;display:block;height:auto}
+.f-nuvens{top:3vh;left:0;width:max(200%,1800px);animation:fnv 200s linear infinite}
+.f-montes,.f-colinas,.f-arvores,.f-chao{left:50%;transform:translateX(-50%);width:max(100%,900px)}
+.f-montes{bottom:calc(58% + 36px)}
+.f-colinas,.f-arvores{bottom:58%}
+.f-chao{bottom:0}
+@keyframes fnv{to{transform:translateX(-50%)}}
+@media(prefers-reduced-motion:reduce){.f-nuvens{animation:none}}
 .kvs{list-style:none;margin:0;padding:0}
 .kvs li{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:3px dotted var(--pergaminho-lin)}
 .kvs li:last-child{border-bottom:0}
@@ -26,6 +35,15 @@ const CSS = `
 .graf .ok{fill:var(--ok)}.graf .aviso{fill:var(--aviso)}.graf .alerta{fill:var(--alerta)}
 .graf line{stroke:rgba(255,243,196,.4);stroke-width:1;stroke-dasharray:4 4;vector-effect:non-scaling-stroke}
 .extra small{color:var(--tinta-suave)}
+`;
+
+const FUNDO = `<div class="fundo" aria-hidden="true">
+<svg class="f-nuvens" viewBox="0 0 960 60" shape-rendering="crispEdges"><defs><g id="fnu"><g fill="#fff"><rect x="20" y="22" width="44" height="8"/><rect x="30" y="16" width="24" height="6"/><rect x="150" y="8" width="56" height="10"/><rect x="162" y="2" width="30" height="6"/><rect x="290" y="30" width="40" height="8"/><rect x="298" y="24" width="22" height="6"/><rect x="380" y="12" width="48" height="8"/><rect x="390" y="6" width="26" height="6"/></g><g fill="#dbeefa"><rect x="20" y="28" width="44" height="2"/><rect x="150" y="16" width="56" height="2"/><rect x="290" y="36" width="40" height="2"/><rect x="380" y="18" width="48" height="2"/></g></g></defs><use href="#fnu"/><use href="#fnu" x="480"/></svg>
+<svg class="f-montes" viewBox="0 0 480 40" shape-rendering="crispEdges"><path fill="#6a9cc2" d="M0 40V26H30V20H56V12H80V18H104V24H140V16H172V8H196V14H224V22H256V18H292V10H318V16H350V24H384V14H412V20H440V26H480V40Z"/><g fill="#eaf5ff"><rect x="56" y="12" width="24" height="3"/><rect x="172" y="8" width="24" height="3"/><rect x="292" y="10" width="26" height="3"/></g><path fill="#4f86ab" d="M0 40V32H24V28H60V22H92V26H128V30H160V24H196V20H228V26H264V30H300V24H336V18H368V24H404V30H440V26H480V40Z"/></svg>
+<svg class="f-colinas" viewBox="0 0 480 30" shape-rendering="crispEdges"><path fill="#3f9a45" d="M0 30V16H40V12H90V8H150V12H210V10H260V6H330V10H390V14H440V10H480V30Z"/><g fill="#6fcf6f"><rect x="90" y="8" width="60" height="2"/><rect x="260" y="6" width="70" height="2"/><rect x="40" y="12" width="50" height="2"/></g><path fill="#34853c" d="M0 30V22H60V18H120V22H190V16H250V20H320V24H380V18H450V22H480V30Z"/></svg>
+<svg class="f-arvores" viewBox="0 0 480 30" shape-rendering="crispEdges"><defs><g id="fat"><rect x="6" y="18" width="4" height="8" fill="#6b4a2a"/><rect x="2" y="8" width="12" height="10" fill="#2e7d3a"/><rect x="4" y="2" width="8" height="6" fill="#2e7d3a"/><rect x="5" y="4" width="3" height="3" fill="#3fae49"/><rect x="4" y="10" width="3" height="3" fill="#3fae49"/></g><g id="fbu"><rect x="0" y="4" width="14" height="6" fill="#2e7d3a"/><rect x="2" y="1" width="10" height="3" fill="#2e7d3a"/><rect x="3" y="2" width="3" height="2" fill="#3fae49"/></g></defs><use href="#fat" x="6" y="4"/><use href="#fbu" x="30" y="20"/><use href="#fat" x="52" y="4"/><use href="#fat" x="72" y="6"/><use href="#fbu" x="104" y="20"/><use href="#fat" x="130" y="4"/><use href="#fat" x="176" y="5"/><use href="#fbu" x="206" y="20"/><use href="#fat" x="236" y="4"/><use href="#fat" x="258" y="6"/><use href="#fbu" x="290" y="20"/><use href="#fat" x="318" y="4"/><use href="#fat" x="346" y="5"/><use href="#fbu" x="378" y="20"/><use href="#fat" x="402" y="4"/><use href="#fat" x="440" y="6"/><use href="#fat" x="464" y="4"/></svg>
+<svg class="f-chao" viewBox="0 0 480 30" shape-rendering="crispEdges"><defs><g id="fto" fill="#4fbf4f"><rect x="0" y="4" width="2" height="4"/><rect x="3" y="1" width="2" height="7"/><rect x="6" y="3" width="2" height="5"/></g></defs><rect y="22" width="480" height="8" fill="#2e7d3a"/><rect y="22" width="480" height="2" fill="#3fae49"/><use href="#fto" x="20" y="15"/><use href="#fto" x="96" y="15"/><use href="#fto" x="170" y="15"/><use href="#fto" x="252" y="15"/><use href="#fto" x="336" y="15"/><use href="#fto" x="410" y="15"/><g><rect x="60" y="14" width="2" height="8" fill="#2e7d3a"/><rect x="58" y="11" width="6" height="4" fill="#ff7ab0"/><rect x="60" y="12" width="2" height="2" fill="#ffd23f"/><rect x="130" y="15" width="2" height="7" fill="#2e7d3a"/><rect x="128" y="12" width="6" height="4" fill="#ffd23f"/><rect x="214" y="14" width="2" height="8" fill="#2e7d3a"/><rect x="212" y="11" width="6" height="4" fill="#fff"/><rect x="214" y="12" width="2" height="2" fill="#ffd23f"/><rect x="300" y="15" width="2" height="7" fill="#2e7d3a"/><rect x="298" y="12" width="6" height="4" fill="#ff7ab0"/><rect x="372" y="14" width="2" height="8" fill="#2e7d3a"/><rect x="370" y="11" width="6" height="4" fill="#d9381e"/><rect x="446" y="15" width="2" height="7" fill="#2e7d3a"/><rect x="444" y="12" width="6" height="4" fill="#ffd23f"/></g></svg>
+</div>
 `;
 
 const PAINEIS = `<!-- data-stardew-extras -->
@@ -184,6 +202,7 @@ function aplicar(h) {
   marca(/<div class="card"><h2>[^<]*Moradores de Pelican/, 'moradores');
   marca(/<div class="card"><h2>[^<]*Di[aá]rio da Fazenda/, 'diario');
   h = trocar(h, '</style>', CSS + '</style>', '</style>');
+  h = trocar(h, '<body>', '<body>' + FUNDO, '<body>');
   h = trocar(h, '<div class="rodape">', PAINEIS + '<div class="rodape">', '<div class="rodape">');
   h = trocar(h, '</body>', JS + '</body>', '</body>');
   return h;
