@@ -7,7 +7,8 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const TIMEZONE = process.env.TZ_NAME || 'America/Sao_Paulo';
-const TEMPLATE = fs.readFileSync(path.join(__dirname, 'template.html'), 'utf8');
+const aplicarExtras = require('./aplicar-template');
+const TEMPLATE = aplicarExtras(fs.readFileSync(path.join(__dirname, 'template.html'), 'utf8'));
 
 const TAREFAS_FILE = path.join(process.env.DATA_DIR || __dirname, 'tarefas.json');
 const MAX_TAREFAS = 30;
@@ -22,10 +23,15 @@ const nivel = (pct) => (pct >= 90 ? 'alerta' : pct >= 70 ? 'aviso' : 'ok');
 const pior = (...n) => (n.includes('alerta') ? 'alerta' : n.includes('aviso') ? 'aviso' : 'ok');
 
 function fmtBytes(b) {
+  b = Number(b) || 0;
   const u = ['B', 'K', 'M', 'G', 'T'];
   let i = 0;
   while (b >= 1024 && i < u.length - 1) { b /= 1024; i++; }
   return (i >= 3 ? b.toFixed(1) : Math.round(b)) + u[i];
+}
+
+function uptime(s) {
+  return `${Math.floor(s / 86400)}d ${Math.floor((s % 86400) / 3600)}h ${Math.floor((s % 3600) / 60)}m ${Math.floor(s % 60)}s`;
 }
 
 function dataLocal() {
@@ -47,6 +53,21 @@ function anotar(msg) {
   diario.push(`[${dataLocal().hora}] ${msg}`);
   if (diario.length > 8) diario.shift();
 }
+
+// ---------- histórico de uso (amostra a cada 10s) e visitas ----------
+const hist = { cpu: [], ram: [] };
+let visitas = 0;
+const empurrar = (arr, v) => { arr.push(v); if (arr.length > 40) arr.shift(); };
+
+async function amostrar() {
+  try {
+    const [l, m] = await Promise.all([si.currentLoad(), si.mem()]);
+    empurrar(hist.cpu, Math.round(l.currentLoad));
+    empurrar(hist.ram, Math.round(((m.total - m.available) / m.total) * 100));
+  } catch { /* ignora */ }
+}
+amostrar();
+setInterval(amostrar, 10000).unref();
 
 // ---------- quadro de missões (tarefas) ----------
 function carregarTarefas() {
@@ -101,9 +122,12 @@ function renderTarefas() {
 }
 
 // ---------- coleta de dados ----------
+const cpuInfoP = si.cpu().catch(() => ({})); // dados fixos do processador: coleta uma vez
+
 async function coletar() {
-  const [load, mem, discos, procs] = await Promise.all([
-    si.currentLoad(), si.mem(), si.fsSize(), si.processes(),
+  const [load, mem, discos, procs, cpuInfo, temp, redes] = await Promise.all([
+    si.currentLoad(), si.mem(), si.fsSize(), si.processes(), cpuInfoP,
+    si.cpuTemperature().catch(() => ({})), si.networkStats().catch(() => []),
   ]);
 
   const cpu = Math.round(load.currentLoad);
@@ -128,7 +152,83 @@ async function coletar() {
   return {
     cpu, energia, ramPct, ramUsada, ramTotal: mem.total, slots,
     disco, discoPct, nivelEnergia, nivelMochila, nivelSilo, top,
+    // novos dados
+    mem, cpuInfo, discos,
+    nucleos: (load.cpus || []).slice(0, 16).map((c) => Math.round(c.load)),
+    temp: typeof temp.main === 'number' ? temp.main : null,
+    rede: (redes || []).find((n) => n.iface && n.iface !== 'lo') || null,
   };
+}
+
+// ---------- painéis extras (usados pelas abas do template) ----------
+const barra = (pct) =>
+  `<div class="barra ${nivel(pct)}"><div style="width:${Math.min(100, Math.max(0, pct))}%"></div></div>`;
+const linha = (rot, pct, txt, det) =>
+  `<div class="row"><span class="rot">${esc(rot)}</span>${barra(pct)}<span>${txt}</span>${det ? `<span class="det">${esc(det)}</span>` : ''}</div>`;
+const kvs = (rows) =>
+  '<ul class="kvs">' + rows.map(([k, v]) => `<li><span class="rot">${esc(k)}</span><b>${esc(v)}</b></li>`).join('') + '</ul>';
+
+function grafico(arr) {
+  if (arr.length < 2) return '<p>Coletando histórico...</p>';
+  const W = 8, H = 100;
+  const barras = arr.map((v, i) =>
+    `<rect class="${nivel(v)}" x="${i * W}" y="${H - Math.max(2, v)}" width="${W - 2}" height="${Math.max(2, v)}"/>`).join('');
+  return `<svg class="graf" viewBox="0 0 ${40 * W} ${H}" preserveAspectRatio="none" shape-rendering="crispEdges" role="img" aria-label="Histórico de uso"><line x1="0" x2="${40 * W}" y1="30" y2="30"/><line x1="0" x2="${40 * W}" y1="10" y2="10"/>${barras}</svg>`;
+}
+
+function paineis(d, geral) {
+  const m = d.mem;
+  const swapPct = m.swaptotal ? Math.round((m.swapused / m.swaptotal) * 100) : 0;
+  const ci = d.cpuInfo || {};
+  const r = d.rede;
+  const vel = (v) => (v == null ? 'medindo...' : fmtBytes(v) + '/s');
+
+  const cpu =
+    kvs([
+      ['Processador', `${ci.manufacturer || ''} ${ci.brand || os.cpus()[0].model}`.trim()],
+      ['Núcleos', `${ci.physicalCores || '?'} físicos / ${ci.cores || os.cpus().length} lógicos`],
+      ['Velocidade', ci.speed ? `${ci.speed} GHz` : 'N/A'],
+      ['Temperatura', d.temp != null ? `${d.temp} °C` : 'indisponível'],
+      ['Carga média (1/5/15 min)', os.loadavg().map((x) => x.toFixed(2)).join(' / ')],
+      ['Uso total', `${d.cpu}%`],
+    ]) +
+    '<div style="margin-top:14px">' + d.nucleos.map((p, i) => linha(`Núcleo ${i + 1}`, p, `${p}%`)).join('') + '</div>';
+
+  const ram =
+    linha('RAM', d.ramPct, `${d.ramPct}%`, `${fmtBytes(d.ramUsada)} de ${fmtBytes(d.ramTotal)}`) +
+    (m.swaptotal ? linha('Swap', swapPct, `${swapPct}%`, `${fmtBytes(m.swapused)} de ${fmtBytes(m.swaptotal)}`) : '') +
+    kvs([
+      ['Total', fmtBytes(d.ramTotal)],
+      ['Em uso', fmtBytes(d.ramUsada)],
+      ['Disponível', fmtBytes(m.available)],
+      ['Em cache', fmtBytes(m.cached)],
+      ['Buffers', fmtBytes(m.buffers)],
+      ['Node (RSS)', fmtBytes(process.memoryUsage().rss)],
+    ]);
+
+  const disco = d.discos.filter((x) => x.size > 0).slice(0, 6).map((x) => {
+    const p = Math.round((x.used / x.size) * 100);
+    return linha(x.mount, p, `${p}%`, `${fmtBytes(x.used)} usados · ${fmtBytes(x.size - x.used)} livres de ${fmtBytes(x.size)} (${x.fs})`);
+  }).join('') || '<p>Nenhum volume encontrado.</p>';
+
+  const rede = kvs([
+    ['Interface', r ? r.iface : 'N/A'],
+    ['Download agora', r ? vel(r.rx_sec) : 'N/A'],
+    ['Upload agora', r ? vel(r.tx_sec) : 'N/A'],
+    ['Total recebido', r ? fmtBytes(r.rx_bytes) : 'N/A'],
+    ['Total enviado', r ? fmtBytes(r.tx_bytes) : 'N/A'],
+    ['Hostname', os.hostname()],
+    ['Sistema', `${os.type()} ${os.release()}`],
+    ['Node / Porta', `${process.version} / ${PORT}`],
+  ]);
+
+  const historico =
+    kvs([['Online há', uptime(process.uptime())], ['Visitas ao site', String(visitas)]]) +
+    '<p class="rot" style="margin:14px 0 6px">⚡ CPU</p>' + grafico(hist.cpu) +
+    '<p class="rot" style="margin:14px 0 6px">🎒 RAM</p>' + grafico(hist.ram) +
+    '<small>Cada barra é uma leitura (10s). Linhas: 70% (aviso) e 90% (alerta).</small>';
+
+  return { PAINEL_CPU: cpu, PAINEL_RAM: ram, PAINEL_DISCO: disco, PAINEL_REDE: rede, PAINEL_HIST: historico, ESTADO: geral };
 }
 
 // ---------- renderização ----------
@@ -163,6 +263,7 @@ function render(d) {
     DIARIO: esc(diario.join('\n')),
     TAREFAS: renderTarefas(),
     ATUALIZADO: t.completo,
+    ...paineis(d, geral),
   };
 
   return TEMPLATE.replace(/\{\{(\w+)\}\}/g, (_, k) => (k in valores ? valores[k] : ''));
@@ -171,6 +272,12 @@ function render(d) {
 // ---------- rotas ----------
 app.disable('x-powered-by');
 app.use(express.urlencoded({ extended: false, limit: '4kb' }));
+
+// conta visitas reais (a atualização automática envia x-live e não conta)
+app.use((req, _res, next) => {
+  if (req.method === 'GET' && req.path === '/' && !req.get('x-live')) visitas++;
+  next();
+});
 
 app.get('/health', (_req, res) => res.send('ok'));
 
