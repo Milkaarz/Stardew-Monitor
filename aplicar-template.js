@@ -3,8 +3,9 @@
 // sem recarregar. O template.html do repositório NÃO precisa ser alterado.
 const CSS = `
 /* ---------- extras (abas, painéis, gráfico) ---------- */
-.ctl{display:flex;flex-wrap:wrap;gap:6px 26px;justify-content:center;margin:0 0 24px;padding:0 8px}
-.ctl button{all:unset;display:inline-block;box-sizing:border-box;position:relative;cursor:pointer;font-family:var(--pixel);font-size:.6rem;line-height:1.6;color:#fff;text-shadow:2px 2px 0 var(--madeira-escura),-1px -1px 0 var(--madeira-escura);padding:6px 2px 18px;transition:color .15s}
+.ctl{display:flex;flex-wrap:nowrap;justify-content:flex-start;gap:0 16px;overflow-x:auto;margin:0 0 24px;padding:4px 16px 0;background:var(--madeira);border:5px solid var(--madeira-escura);box-shadow:0 5px 0 #3a1e04,inset 0 0 0 2px var(--madeira-clara);scrollbar-width:thin;scrollbar-color:var(--ouro) var(--madeira-escura)}
+.ctl button:first-child{margin-left:auto}.ctl button:last-child{margin-right:auto}
+.ctl button{all:unset;display:inline-block;flex:none;white-space:nowrap;box-sizing:border-box;position:relative;cursor:pointer;font-family:var(--pixel);font-size:.5rem;line-height:1.6;color:#fff;text-shadow:2px 2px 0 var(--madeira-escura),-1px -1px 0 var(--madeira-escura);padding:10px 2px 20px;transition:color .15s}
 .ctl button:hover{color:var(--pergaminho)}
 .ctl button.on{color:var(--ouro)}
 .ctl button.on::after{content:"";position:absolute;left:50%;bottom:3px;width:8px;height:8px;margin-left:-4px;background:var(--ouro);box-shadow:0 0 0 2px var(--madeira-escura)}
