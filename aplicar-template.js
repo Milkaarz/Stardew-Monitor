@@ -32,6 +32,8 @@ const PAINEIS = `<!-- data-stardew-extras -->
 
 const JS = `<script>
 (function () {
+  var ABAS = [['tudo','📋 Tudo'],['fazenda','🌾 Fazenda'],['missoes','📜 Missões'],['moradores','🏘️ Moradores'],['diario','📖 Diário'],['cpu','⚡ CPU'],['ram','🎒 RAM'],['disco','🏚️ Disco'],['rede','🛣️ Rede'],['historico','📈 Histórico']];
+  var aba = location.hash.slice(1) || 'fazenda';
   var som = true, ctx = null, liberado = false, tocando = false, timer = null, passo = 0, prox = 0;
   try { som = localStorage.getItem('som') !== 'off'; } catch (e) {}
   ['pointerdown', 'keydown'].forEach(function (ev) { addEventListener(ev, function () { liberado = true; }, { once: true }); });
@@ -75,13 +77,23 @@ const JS = `<script>
 
   var ctl = document.createElement('div');
   ctl.className = 'ctl';
-  ctl.innerHTML = '<div class="som"><button type="button" id="bSom"></button><button type="button" id="bMus"></button></div>';
+  ctl.innerHTML = '<div class="abas">' + ABAS.map(function (a) { return '<button type="button" data-aba="' + a[0] + '">' + a[1] + '</button>'; }).join('') +
+    '</div><div class="som"><button type="button" id="bSom"></button><button type="button" id="bMus"></button></div>';
   var ancora = document.querySelector('.placa') || document.querySelector('.wrap > h1');
   if (ancora) ancora.after(ctl); else document.body.prepend(ctl);
 
+  function mostrar(nome) {
+    if (!ABAS.some(function (a) { return a[0] === nome; })) nome = 'fazenda';
+    aba = nome;
+    document.querySelectorAll('.wrap > .card[data-pane]').forEach(function (c) {
+      c.style.display = (nome === 'tudo' || c.dataset.pane === nome) ? '' : 'none';
+    });
+    ctl.querySelectorAll('[data-aba]').forEach(function (b) { b.classList.toggle('on', b.dataset.aba === nome); });
+  }
   ctl.addEventListener('click', function (e) {
     var b = e.target.closest('button'); if (!b) return;
     liberado = true;
+    if (b.dataset.aba) { history.replaceState(null, '', '#' + b.dataset.aba); mostrar(b.dataset.aba); sfx.aba(); }
     if (b.id === 'bSom') {
       som = !som; try { localStorage.setItem('som', som ? 'on' : 'off'); } catch (x) {}
       if (!som && tocando) { tocando = false; clearInterval(timer); } else if (som) sfx.ok();
@@ -111,13 +123,14 @@ const JS = `<script>
         var novos = doc.querySelectorAll(s), atuais = document.querySelectorAll(s);
         atuais.forEach(function (el, i) { if (novos[i]) el.replaceWith(novos[i]); });
       });
+      mostrar(aba);
       var n = nivel(doc);
       if (n && ultimo && n !== ultimo) { (rank[n] > rank[ultimo] ? sfx[n] : sfx.ok)(); }
       ultimo = n || ultimo;
     } catch (e) { /* tenta de novo no próximo ciclo */ }
   }, 10000);
 
-  pintar();
+  pintar(); mostrar(aba);
 })();
 </script>
 `;
@@ -131,6 +144,12 @@ function aplicar(h) {
   if (h.includes('data-stardew-extras')) return h; // já aplicado
   // remove o script antigo que recarregava a página inteira
   h = h.replace(/<script>(?:(?!<\/script>)[\s\S])*location\.reload(?:(?!<\/script>)[\s\S])*<\/script>/i, '');
+  const marca = (re, aba) => { h = h.replace(re, (m) => m.replace('<div class="card', '<div data-pane="' + aba + '" class="card')); };
+  marca(/<div class="card"><h2>[^<]*Recursos da Fazenda/, 'fazenda');
+  marca(/<div class="card msg"/, 'fazenda');
+  marca(/<div class="card"><h2>[^<]*Quadro de Miss/, 'missoes');
+  marca(/<div class="card"><h2>[^<]*Moradores de Pelican/, 'moradores');
+  marca(/<div class="card"><h2>[^<]*Di[aá]rio da Fazenda/, 'diario');
   h = trocar(h, '</style>', CSS + '</style>', '</style>');
   h = trocar(h, '<div class="rodape">', PAINEIS + '<div class="rodape">', '<div class="rodape">');
   h = trocar(h, '</body>', JS + '</body>', '</body>');
