@@ -3,12 +3,18 @@
 // sem recarregar. O template.html do repositório NÃO precisa ser alterado.
 const CSS = `
 /* ---------- extras (abas, painéis, gráfico) ---------- */
-.ctl{display:flex;flex-wrap:wrap;gap:10px 18px;justify-content:center;margin:0 0 20px}
-.ctl .abas,.ctl .som{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
-.ctl button{font-family:var(--pixel);font-size:.55rem;color:var(--ouro);background:var(--madeira);padding:10px 12px;border:4px solid var(--madeira-escura);box-shadow:0 4px 0 #3a1e04,inset 0 0 0 2px var(--madeira-clara);text-shadow:2px 2px 0 var(--madeira-escura);cursor:pointer}
-.ctl button.on{background:var(--pergaminho);color:var(--tinta);text-shadow:none;box-shadow:0 4px 0 #3a1e04,inset 0 0 0 3px var(--ouro)}
-.ctl button:active{transform:translateY(3px)}
+.ctl{display:flex;flex-wrap:wrap;gap:6px 26px;justify-content:center;margin:0 0 24px;padding:0 8px}
+.ctl button{all:unset;display:inline-block;box-sizing:border-box;position:relative;cursor:pointer;font-family:var(--pixel);font-size:.6rem;line-height:1.6;color:#fff;text-shadow:2px 2px 0 var(--madeira-escura),-1px -1px 0 var(--madeira-escura);padding:6px 2px 18px;transition:color .15s}
+.ctl button:hover{color:var(--pergaminho)}
+.ctl button.on{color:var(--ouro)}
+.ctl button.on::after{content:"";position:absolute;left:50%;bottom:3px;width:8px;height:8px;margin-left:-4px;background:var(--ouro);box-shadow:0 0 0 2px var(--madeira-escura)}
 .ctl button:focus-visible{outline:3px solid var(--ouro);outline-offset:2px}
+.somfix{position:fixed;top:10px;left:10px;z-index:50;display:flex;gap:8px}
+.somfix button{font-family:var(--pixel);font-size:.5rem;color:var(--ouro);background:var(--madeira);padding:8px 10px;border:3px solid var(--madeira-escura);box-shadow:0 3px 0 #3a1e04,inset 0 0 0 2px var(--madeira-clara);text-shadow:2px 2px 0 var(--madeira-escura);cursor:pointer}
+.somfix button.on{background:var(--pergaminho);color:var(--tinta);text-shadow:none;box-shadow:0 3px 0 #3a1e04,inset 0 0 0 3px var(--ouro)}
+.somfix button:active{transform:translateY(2px)}
+.somfix button:focus-visible{outline:3px solid var(--ouro);outline-offset:2px}
+@media(max-width:700px){body{padding-top:58px}}
 .kvs{list-style:none;margin:0;padding:0}
 .kvs li{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:3px dotted var(--pergaminho-lin)}
 .kvs li:last-child{border-bottom:0}
@@ -77,8 +83,11 @@ const JS = `<script>
 
   var ctl = document.createElement('div');
   ctl.className = 'ctl';
-  ctl.innerHTML = '<div class="abas">' + ABAS.map(function (a) { return '<button type="button" data-aba="' + a[0] + '">' + a[1] + '</button>'; }).join('') +
-    '</div><div class="som"><button type="button" id="bSom"></button><button type="button" id="bMus"></button></div>';
+  ctl.innerHTML = ABAS.map(function (a) { return '<button type="button" data-aba="' + a[0] + '">' + a[1] + '</button>'; }).join('');
+  var somEl = document.createElement('div');
+  somEl.className = 'somfix';
+  somEl.innerHTML = '<button type="button" id="bSom"></button><button type="button" id="bMus"></button>';
+  document.body.appendChild(somEl);
   var ancora = document.querySelector('.placa') || document.querySelector('.wrap > h1');
   if (ancora) ancora.after(ctl); else document.body.prepend(ctl);
 
@@ -90,8 +99,8 @@ const JS = `<script>
     });
     ctl.querySelectorAll('[data-aba]').forEach(function (b) { b.classList.toggle('on', b.dataset.aba === nome); });
   }
-  ctl.addEventListener('click', function (e) {
-    var b = e.target.closest('button'); if (!b) return;
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('.ctl button, .somfix button'); if (!b) return;
     liberado = true;
     if (b.dataset.aba) { history.replaceState(null, '', '#' + b.dataset.aba); mostrar(b.dataset.aba); sfx.aba(); }
     if (b.id === 'bSom') {
