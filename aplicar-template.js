@@ -9,7 +9,6 @@ const CSS = `
 .ctl button.on{background:var(--pergaminho);color:var(--tinta);text-shadow:none;box-shadow:0 4px 0 #3a1e04,inset 0 0 0 3px var(--ouro)}
 .ctl button:active{transform:translateY(3px)}
 .ctl button:focus-visible{outline:3px solid var(--ouro);outline-offset:2px}
-.extra{display:none}.extra.on{display:block}
 .kvs{list-style:none;margin:0;padding:0}
 .kvs li{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:3px dotted var(--pergaminho-lin)}
 .kvs li:last-child{border-bottom:0}
@@ -33,8 +32,6 @@ const PAINEIS = `<!-- data-stardew-extras -->
 
 const JS = `<script>
 (function () {
-  var ABAS = [['fazenda','🌾 Fazenda'],['cpu','⚡ CPU'],['ram','🎒 RAM'],['disco','🏚️ Disco'],['rede','🛣️ Rede'],['historico','📈 Histórico']];
-  var aba = location.hash.slice(1) || 'fazenda';
   var som = true, ctx = null, liberado = false, tocando = false, timer = null, passo = 0, prox = 0;
   try { som = localStorage.getItem('som') !== 'off'; } catch (e) {}
   ['pointerdown', 'keydown'].forEach(function (ev) { addEventListener(ev, function () { liberado = true; }, { once: true }); });
@@ -78,22 +75,13 @@ const JS = `<script>
 
   var ctl = document.createElement('div');
   ctl.className = 'ctl';
-  ctl.innerHTML = '<div class="abas">' + ABAS.map(function (a) { return '<button type="button" data-aba="' + a[0] + '">' + a[1] + '</button>'; }).join('') +
-    '</div><div class="som"><button type="button" id="bSom"></button><button type="button" id="bMus"></button></div>';
+  ctl.innerHTML = '<div class="som"><button type="button" id="bSom"></button><button type="button" id="bMus"></button></div>';
   var ancora = document.querySelector('.placa') || document.querySelector('.wrap > h1');
   if (ancora) ancora.after(ctl); else document.body.prepend(ctl);
 
-  function mostrar(nome) {
-    if (!ABAS.some(function (a) { return a[0] === nome; })) nome = 'fazenda';
-    aba = nome;
-    document.querySelectorAll('.wrap > .card:not(.extra)').forEach(function (c) { c.style.display = nome === 'fazenda' ? '' : 'none'; });
-    document.querySelectorAll('.extra').forEach(function (c) { c.classList.toggle('on', c.dataset.pane === nome); });
-    ctl.querySelectorAll('[data-aba]').forEach(function (b) { b.classList.toggle('on', b.dataset.aba === nome); });
-  }
   ctl.addEventListener('click', function (e) {
     var b = e.target.closest('button'); if (!b) return;
     liberado = true;
-    if (b.dataset.aba) { history.replaceState(null, '', '#' + b.dataset.aba); mostrar(b.dataset.aba); sfx.aba(); }
     if (b.id === 'bSom') {
       som = !som; try { localStorage.setItem('som', som ? 'on' : 'off'); } catch (x) {}
       if (!som && tocando) { tocando = false; clearInterval(timer); } else if (som) sfx.ok();
@@ -123,14 +111,13 @@ const JS = `<script>
         var novos = doc.querySelectorAll(s), atuais = document.querySelectorAll(s);
         atuais.forEach(function (el, i) { if (novos[i]) el.replaceWith(novos[i]); });
       });
-      mostrar(aba);
       var n = nivel(doc);
       if (n && ultimo && n !== ultimo) { (rank[n] > rank[ultimo] ? sfx[n] : sfx.ok)(); }
       ultimo = n || ultimo;
     } catch (e) { /* tenta de novo no próximo ciclo */ }
   }, 10000);
 
-  pintar(); mostrar(aba);
+  pintar();
 })();
 </script>
 `;
