@@ -121,11 +121,13 @@ const JS = `<script>
   var ultimo = nivel(document);
   var SEL = ['.placa', '.wrap > .card:not(.extra)', '.extra', '.rodape'];
 
-  setInterval(async function () {
-    var a = document.activeElement;
-    if (a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA')) return;
-    var campo = document.querySelector('input[name=texto]');
-    if (campo && campo.value) return;
+  async function atualizar(forcar) {
+    if (!forcar) {
+      var a = document.activeElement;
+      if (a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA')) return;
+      var campo = document.querySelector('input[name=texto]');
+      if (campo && campo.value) return;
+    }
     try {
       var r = await fetch('/', { headers: { 'x-live': '1' }, cache: 'no-store' });
       var doc = new DOMParser().parseFromString(await r.text(), 'text/html');
@@ -138,7 +140,28 @@ const JS = `<script>
       if (n && ultimo && n !== ultimo) { (rank[n] > rank[ultimo] ? sfx[n] : sfx.ok)(); }
       ultimo = n || ultimo;
     } catch (e) { /* tenta de novo no próximo ciclo */ }
-  }, 10000);
+  }
+  setInterval(function () { atualizar(false); }, 10000);
+
+  // adicionar, marcar e apagar tarefas sem recarregar a página (mantém a aba e a música)
+  document.addEventListener('submit', async function (e) {
+    var f = e.target;
+    var acao = (f.getAttribute && f.getAttribute('action')) || '';
+    if (acao.indexOf('/tarefas') !== 0) return;
+    e.preventDefault();
+    try {
+      await fetch(acao, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'x-live': '1' },
+        body: new URLSearchParams(new FormData(f)).toString()
+      });
+    } catch (x) { /* a próxima atualização corrige */ }
+    await atualizar(true);
+    if (f.classList.contains('nova')) {
+      var novo = document.querySelector('.nova input[name=texto]');
+      if (novo) novo.focus();
+    }
+  });
 
   pintar(); mostrar(aba);
 })();

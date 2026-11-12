@@ -279,6 +279,9 @@ app.use((req, _res, next) => {
   next();
 });
 
+// fim das ações de tarefas: o painel (x-live) só precisa de "ok"; sem JS volta à aba Missões
+const fim = (req, res) => (req.get('x-live') ? res.sendStatus(204) : res.redirect(303, '/#missoes'));
+
 app.get('/health', (_req, res) => res.send('ok'));
 
 app.get('/', async (_req, res) => {
@@ -302,21 +305,21 @@ app.post('/tarefas', (req, res) => {
     });
     salvarTarefas(db);
   }
-  res.redirect(303, '/');
+  fim(req, res);
 });
 
 app.post('/tarefas/:id/toggle', (req, res) => {
   const db = tarefasDoDia();
   const t = db.itens.find((x) => x.id === req.params.id);
   if (t) { t.feita = !t.feita; salvarTarefas(db); }
-  res.redirect(303, '/');
+  fim(req, res);
 });
 
 app.post('/tarefas/:id/apagar', (req, res) => {
   const db = tarefasDoDia();
   db.itens = db.itens.filter((x) => x.id !== req.params.id);
   salvarTarefas(db);
-  res.redirect(303, '/');
+  fim(req, res);
 });
 
 app.listen(PORT, '0.0.0.0', () => console.log(`Stardew Monitor rodando na porta ${PORT}`));
