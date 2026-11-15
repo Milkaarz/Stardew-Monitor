@@ -5,7 +5,7 @@ uma interface inspirada em *Stardew Valley*. Ele apresenta informações
 técnicas usando elementos visuais de fazenda, pixel art, placas de
 madeira e pergaminhos.
 
-⚙ Acesse em tempo Real: https://stardewmonitor.onrender.com
+⚙ Acesse em tempo Real: https://mizzie.nyx.dev.br/stardew/
 
 ## 📌 Objetivo
 
