@@ -1,0 +1,12 @@
+# dependências (quem clonar roda "npm install")
+node_modules/
+
+# configuração com senha do agente (use o .env.example como modelo)
+.env
+
+# dado gerado pelo receber.php no servidor
+dados.json
+
+
+*.log
+.DS_Store

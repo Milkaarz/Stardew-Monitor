@@ -1,0 +1,18 @@
+{
+  "name": "stardewmonitor",
+  "version": "2.0.0",
+  "description": "Dashboard de Sistemas Operacionais no Tema Stardew Valley: painel local e agente para hospedagem PHP",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "agente": "node --env-file=.env agente-stardew.js",
+    "pm2": "pm2 start ecosystem.stardew.config.js"
+  },
+  "engines": {
+    "node": ">=18.15.0"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1"
+  }
+}
