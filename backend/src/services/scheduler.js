@@ -2,11 +2,11 @@
  * Tarefas periódicas:
  *  - a cada 5 s: detecta máquinas sem sinal (cinza no mapa);
  *  - a cada 60 s: agrega o histórico e salva os contadores das conquistas;
- *  - a cada hora: retenção de dados, sessões expiradas e conquistas de longo prazo.
+ *  - a cada hora: retenção de dados e conquistas de longo prazo.
  */
 export class Scheduler {
-  constructor({ machines, ingest, history, achievements, auth, settings, logger }) {
-    Object.assign(this, { machines, ingest, history, achievements, auth, settings, logger });
+  constructor({ machines, ingest, history, achievements, settings, logger }) {
+    Object.assign(this, { machines, ingest, history, achievements, settings, logger });
     this.timers = [];
     this.lastHourly = 0;
   }
@@ -34,7 +34,6 @@ export class Scheduler {
   async hourly(now = Date.now()) {
     this.lastHourly = now;
     await this.history.applyRetention(now);
-    await this.auth.purgeExpired();
     await this.achievements.periodic(this.machines.list(), now);
   }
 

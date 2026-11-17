@@ -2,7 +2,7 @@
 
 Monitor de hardware e recursos do sistema com visual de fazenda em pixel art. Cada recurso real do computador vira um elemento da fazenda: a **casa** é a CPU, a **plantação** é a RAM, o **celeiro e os silos** são os discos, a **carroça e o correio** são a rede, o **moinho** é a GPU, o **clima** reage à temperatura e à carga, a **estamina** é a bateria e os **dias na fazenda** são o tempo ligado.
 
-Não é só ilustração: todos os números vêm de leituras reais, guardadas em banco de dados, com alertas, histórico, conquistas, diário e monitoramento de várias máquinas.
+Não é só ilustração: todos os números vêm de leituras reais **do computador onde ele está rodando**, guardadas num banco local, com alertas, histórico, conquistas e diário. Roda inteiro no seu computador: **sem login, sem conta e sem servidor na internet**.
 
 > Projeto de fã, inspirado na estética de jogos de fazenda em pixel art. Toda a arte é original, desenhada em código (SVG); nenhum recurso de jogo é usado.
 
@@ -19,52 +19,57 @@ Não é só ilustração: todos os números vêm de leituras reais, guardadas em
 | 🐔 **Animais** | Galinhas felizes/assustadas (saúde geral), vacas descansando (ociosidade), porcos fuçando (E/S de disco), patos no lago (tudo normal). Os números continuam sempre visíveis. |
 | 🔔 **Alertas** | Limites individuais (CPU, RAM, disco, temperatura, GPU, bateria, máquina sem sinal), tempo de sustentação, sem repetição, intervalo mínimo, avisos de recuperação. Envio por **Discord**, **Telegram** e **e-mail**. Sons 8 bits opcionais (desligados por padrão). |
 | 📈 **Histórico** | Gráficos de CPU, RAM, GPU, temperatura, rede e disco: 15 min, 1 h, 6 h, 24 h, 7 dias e 30 dias, com agregação por minuto/hora e retenção configurável. |
-| 🧑‍🌾 **Moradores** | Processos com ordenação, filtros, pesquisa e 10/25/50/100 resultados. **Expulsar morador** (encerrar processo) só para administrador, com senha, confirmação, proteção de processos essenciais e auditoria. |
-| 🏘️ **Pelican Town** | Mapa com uma casinha por máquina: verde, amarelo, vermelho ou cinza (sem sinal). Agente leve com token individual para cada máquina. |
+| 🧑‍🌾 **Moradores** | Processos com ordenação, filtros, pesquisa e 10/25/50/100 resultados. **Expulsar morador** (encerrar processo) com confirmação, só a partir do próprio computador, com proteção de processos essenciais e auditoria. |
+| 🏘️ **Pelican Town** | Mapa com uma casinha por máquina: verde, amarelo, vermelho ou cinza (sem sinal). Opcional: outras máquinas da sua rede podem enviar dados com o agente. |
 | 🏆 **Conquistas** | Persistentes, com progresso e data: Fazendeiro Dedicado, Veterano da Fazenda, Colheita Recorde, Fazenda Organizada, Dia Tranquilo, Máquina Incansável e outras. |
 | 🎉 **Festivais** | Festival do Ovo, Dança das Flores, Luau de Verão, Noite dos Espíritos, Festival da Lua Gelada e Festival das Estrelas, com decorações temporárias e datas configuráveis. |
 | 📖 **Diário** | Changelog da máquina: categorias, pesquisa, histórico por data e salvamento automático. Mais o **Quadro de Missões** (tarefas, com missões diárias). |
 | 🎨 **Temas** | Fazenda Padrão, da Floresta, da Praia, da Colina, de Gengibre e Minas (interface escura). |
-| 🔒 **Segurança** | Login, papéis (administrador/visitante), CSRF, rate limiting, validação de tudo que entra, tokens de agente com assinatura HMAC, segredos criptografados, auditoria. |
+| 🔒 **Segurança** | Sem login: o painel só responde no próprio computador (127.0.0.1) e recusa pedidos de outros sites. Validação de tudo que entra, rate limiting, segredos criptografados, auditoria. |
 
-## 🚀 Início rápido
+## ⬇️ Baixar e usar (recomendado)
 
-Requisitos: **Node.js 22.13 ou superior** (usa o SQLite nativo do Node) e npm.
+1. Baixe o aplicativo do seu sistema na página **Releases** do GitHub:
+   - Windows: `StardewMonitor-windows-x64.exe`
+   - Linux: `StardewMonitor-linux-x64` (depois `chmod +x StardewMonitor-linux-x64`)
+2. Abra o arquivo (dois cliques). Não precisa instalar nada, nem Node.js.
+3. O navegador abre sozinho em **http://localhost:3001** com a fazenda **deste** computador.
+4. Para encerrar, feche a janela do aplicativo.
+
+Os dados (histórico, conquistas, diário, configurações) ficam em `%LOCALAPPDATA%StardewMonitor` no Windows e `~/.local/share/stardew-monitor` no Linux. Abrir o aplicativo de novo, com ele já aberto, só abre o navegador.
+
+> O Windows pode mostrar "O Windows protegeu o computador" na primeira vez, porque o executável não tem assinatura digital paga. Clique em **Mais informações → Executar assim mesmo**. Detalhes em [docs/aplicativo.md](docs/aplicativo.md).
+
+### Gerar o aplicativo você mesmo
+
+```bash
+npm install
+npm run app:build      # cria release/StardewMonitor-<sistema>-<arquitetura>
+```
+
+## 🧑‍💻 Rodar pelo código-fonte
+
+Requisitos: **Node.js 22.13+** e npm.
 
 ```bash
 git clone https://github.com/Milkaarz/Stardew-Monitor.git
 cd Stardew-Monitor
 npm install
 npm run build          # compila a interface
-cp .env.example .env   # opcional: defina ADMIN_PASSWORD (mín. 10 caracteres)
-npm start
+npm start              # http://localhost:3001
 ```
 
-Abra **http://localhost:3001** e entre com `admin` e a senha de `ADMIN_PASSWORD` — ou a senha gerada que aparece **uma vez** no log da primeira inicialização.
+## 🖥️ Por que tem que rodar no computador?
 
-Com Docker:
+Um site na internet não consegue ler o hardware de quem o visita, e uma hospedagem (Render, Vercel...) só enxerga o próprio servidor. Por isso o Stardew Monitor é um aplicativo que roda **no computador que você quer monitorar**: ele lê os sensores direto do sistema e mostra o painel no seu navegador, em `localhost`.
 
-```bash
-cp .env.example .env   # defina ADMIN_PASSWORD e APP_SECRET
-docker compose up -d
-```
-
-## 🖥️ Local x hospedado: leia antes de publicar
-
-O servidor monitora **a máquina onde ele roda**. Se você hospedar o painel na nuvem (Render, Railway, uma VPS…), a "Fazenda Principal" mostrará o **servidor da hospedagem**, não o seu computador. Serviços como Vercel e Render não conseguem enxergar o hardware do seu PC.
-
-Para monitorar seu PC (ou vários), rode o **agente** em cada máquina: ele coleta localmente e envia para o servidor central. Veja [docs/deploy.md](docs/deploy.md) e [docs/agente.md](docs/agente.md).
-
-```
- Seu PC ──agente──┐
- Notebook ─agente─┼──HTTPS──▶ Servidor central (API + painel + banco) ◀── navegador
- Servidor ─agente─┘
-```
+Quer acompanhar outras máquinas da sua casa/rede no mesmo painel? Rode o **agente** nelas (veja [docs/agente.md](docs/agente.md)).
 
 ## 📁 Estrutura
 
 ```
-backend/    API Express, SSE em tempo real, alertas, conquistas, histórico, autenticação
+app/        aplicativo baixável (abre o servidor local e o navegador)
+backend/    API Express, SSE em tempo real, alertas, conquistas, histórico, proteção local
 agent/      agente leve + coletor de métricas multiplataforma (usado também pelo backend)
 frontend/   interface Preact + Vite: fazenda em SVG, páginas, gráficos, sons
 database/   adaptadores SQLite/PostgreSQL e migrations
@@ -76,9 +81,10 @@ legacy/     versão 2 (painel antigo e modo hospedagem PHP), preservada
 
 ## 📚 Documentação
 
-- [Instalação e configuração](docs/instalacao.md)
+- [Aplicativo baixável](docs/aplicativo.md)
+- [Instalação e configuração (código-fonte)](docs/instalacao.md)
 - [Agente de monitoramento](docs/agente.md)
-- [Deploy: local, Docker, nuvem e PostgreSQL](docs/deploy.md)
+- [Outras formas de rodar: Docker e PostgreSQL](docs/deploy.md)
 - [API REST e tempo real](docs/api.md)
 - [Arquitetura](docs/arquitetura.md) e [diagramas](docs/diagramas.md)
 - [Segurança](docs/seguranca.md)
@@ -96,14 +102,15 @@ npm run test:pg   # persistência + API no PostgreSQL (defina TEST_DATABASE_URL 
 npm run build
 ```
 
-O GitHub Actions roda tudo isso em Linux e Windows, mais a suíte no PostgreSQL e o build das imagens Docker.
+O GitHub Actions roda tudo isso em Linux e Windows, mais a suíte no PostgreSQL, o build do Docker e gera os executáveis (anexados à Release quando uma tag `v*` é criada).
 
 ## ⚠️ Limitações conhecidas
 
 - **Temperatura da CPU e RPM das ventoinhas no Windows** só aparecem com o [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor) aberto (o Windows não expõe esses sensores sem ele). No Linux vêm do `hwmon`.
 - **Uso da GPU**: NVIDIA via `nvidia-smi` (Windows/Linux) e AMD/Intel via `/sys` no Linux. Outras placas mostram nome e VRAM, sem uso.
 - **Usuário dono do processo** não é informado no Windows sem privilégios de administrador.
-- Dentro de contêineres, o monitor local enxerga o contêiner; prefira o agente nativo.
+- Dentro de contêineres, o monitor local enxerga o contêiner; prefira o aplicativo.
+- O aplicativo não tem assinatura digital: o Windows SmartScreen e alguns antivírus podem pedir confirmação na primeira execução.
 
 ## 👤 Autor
 

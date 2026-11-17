@@ -1,31 +1,23 @@
-# Deploy: local x hospedado
+# Outras formas de rodar
 
-## O ponto mais importante
+O recomendado é o [aplicativo baixável](aplicativo.md). Esta página cobre Docker, PostgreSQL e o modo com agentes.
 
-**O servidor monitora a máquina em que ele está rodando.** Um navegador não consegue ler o hardware de quem acessa o site, e nenhuma hospedagem (Render, Vercel, Railway, VPS...) consegue enxergar o seu computador pessoal.
+## Por que não hospedar na internet?
 
-| Cenário | O que a "Fazenda Principal" mostra | Como monitorar o seu PC |
-|---|---|---|
-| Servidor rodando **no seu PC** | O seu PC ✅ | Já está monitorando |
-| Servidor numa **VPS/Render** | A máquina da hospedagem | Rode o **agente** no seu PC |
-| Servidor em **Docker** | O contêiner (com limites do Docker) | Rode o **agente** nativo |
-| **Vercel / hospedagem estática** | Não funciona: não há servidor Node persistente, SSE nem banco local | Use uma hospedagem com processo Node |
+O Stardew Monitor lê os sensores **da máquina onde ele roda**. Um site na internet não consegue ler o hardware de quem o visita, e nenhuma hospedagem (Render, Vercel, Railway, VPS...) enxerga o seu computador. Além disso, o painel **não tem login**: ele foi feito para responder só no próprio computador. Por isso não há modo "hospedado".
 
-Se o monitor da máquina da hospedagem não interessa, desligue com `LOCAL_MONITOR=false` — o painel fica só com as fazendas dos agentes.
-
-## 1. Local (uma máquina)
+## 1. Código-fonte
 
 ```bash
 npm install && npm run build && npm start
 ```
 
-SQLite em `data/stardew.db`. Acesse `http://localhost:3001` ou, na rede local, `http://IP-do-PC:3001`. Para acesso fora de casa, prefira uma VPN (Tailscale, WireGuard) a abrir a porta no roteador.
+SQLite em `data/stardew.db`, painel em `http://localhost:3001`.
 
 ## 2. Docker
 
 ```bash
-cp .env.example .env            # defina ADMIN_PASSWORD e APP_SECRET
-docker compose up -d            # SQLite no volume stardew-data
+docker compose up -d            # SQLite no volume stardew-data; porta publicada só em 127.0.0.1
 ```
 
 Com PostgreSQL:
@@ -35,37 +27,20 @@ Com PostgreSQL:
 docker compose --profile postgres up -d
 ```
 
-A imagem roda como usuário sem privilégios, tem healthcheck (`/api/health`) e guarda os dados em `/app/data`.
+A imagem roda como usuário sem privilégios, tem healthcheck (`/api/health`) e guarda os dados em `/app/data`. Dentro do contêiner, o monitor local enxerga o contêiner/host do Docker (com limites); para o seu PC, prefira o aplicativo.
 
-## 3. Servidor central na internet (várias máquinas)
+## 3. Várias máquinas na mesma rede (opcional)
 
-1. Hospede o servidor (VPS com Docker, Render com "Web Service", Railway, Fly.io...). Use **PostgreSQL** para várias máquinas e para não perder dados em hospedagens com disco efêmero (no Render, o disco do serviço é apagado a cada deploy, a menos que você use um Persistent Disk).
-2. Coloque **HTTPS** na frente (a maioria das hospedagens já fornece; numa VPS, use Caddy ou Nginx).
-3. Variáveis mínimas: `NODE_ENV=production`, `APP_SECRET`, `ADMIN_PASSWORD`, `DATABASE_URL`, `TRUST_PROXY=1`. Considere `LOCAL_MONITOR=false`.
-4. Registre cada máquina em **Pelican Town** e instale o agente nelas ([agente.md](agente.md)).
-
-### Exemplo: Render
-
-- Tipo: Web Service (Docker). Porta: 3001. Health check path: `/api/health`.
-- Banco: Render PostgreSQL → copie a "Internal Database URL" para `DATABASE_URL` e use `DATABASE_SSL=true` se a URL for externa.
-- Variáveis: as do passo 3.
-
-### Exemplo: Caddy na frente do Docker
-
-```
-monitor.seudominio.com {
-  reverse_proxy localhost:3001
-}
-```
-
-O SSE (`/api/stream`) funciona por trás de Caddy e Nginx; no Nginx, desative o buffering para essa rota (`proxy_buffering off;`) — o servidor já envia `X-Accel-Buffering: no`.
+1. No computador "central", rode o Stardew Monitor com `HOST=0.0.0.0` (pelo código-fonte, ou com a variável de ambiente definida antes de abrir o aplicativo). O **painel** continua respondendo só em `localhost`; a porta aberta serve apenas para os agentes, que usam token próprio.
+2. Libere a porta 3001 no firewall só para a rede local.
+3. Registre cada máquina em **Pelican Town** e instale o agente nelas ([agente.md](agente.md)), com `STARDEW_SERVER_URL=http://IP-do-central:3001` e `STARDEW_ALLOW_INSECURE=true` (rede doméstica confiável), ou use HTTPS com um proxy local.
 
 ## SQLite ou PostgreSQL?
 
 | | SQLite | PostgreSQL |
 |---|---|---|
 | Instalação | nenhuma | servidor/serviço gerenciado |
-| Ideal para | 1 máquina, até poucas fazendas | várias máquinas, hospedagem na nuvem |
+| Ideal para | 1 máquina, até poucas fazendas | muitas máquinas com agentes |
 | Backups | copiar `data/stardew.db` (com o servidor parado ou usando `sqlite3 .backup`) | `pg_dump` |
 
 As migrations rodam sozinhas no início (ou com `npm run migrate`). Os dois bancos usam o mesmo esquema e são testados no CI.

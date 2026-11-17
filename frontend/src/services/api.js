@@ -1,8 +1,8 @@
 /**
- * Cliente da API: cookies de sessão + cabeçalho CSRF em toda alteração.
+ * Cliente da API do painel local. Toda alteração leva o cabeçalho X-Stardew-Monitor,
+ * que o servidor exige para recusar pedidos vindos de outros sites.
  * Os segredos (Discord, Telegram, SMTP) só trafegam do navegador para o servidor, nunca o contrário.
  */
-import { setState, state } from './store.js';
 
 export class ApiError extends Error {
   constructor(message, status, issues) {
@@ -15,7 +15,7 @@ export class ApiError extends Error {
 async function request(method, path, body, { signal } = {}) {
   const headers = { Accept: 'application/json' };
   if (body !== undefined) headers['Content-Type'] = 'application/json';
-  if (method !== 'GET' && state.auth.csrf) headers['X-CSRF-Token'] = state.auth.csrf;
+  if (method !== 'GET') headers['X-Stardew-Monitor'] = '1';
   let res;
   try {
     res = await fetch(`/api${path}`, {
@@ -27,16 +27,13 @@ async function request(method, path, body, { signal } = {}) {
     });
   } catch (err) {
     if (err.name === 'AbortError') throw err;
-    throw new ApiError('Sem conexão com o servidor da fazenda.', 0);
+    throw new ApiError('Sem conexão com o Stardew Monitor. Ele ainda está aberto?', 0);
   }
   let data = null;
   try {
     data = await res.json();
   } catch {
     /* sem corpo */
-  }
-  if (res.status === 401 && path !== '/auth/login' && path !== '/auth/me') {
-    setState({ auth: { ...state.auth, status: 'anonymous', user: null, csrf: null } });
   }
   if (!res.ok) {
     const issues = data?.issues || [];

@@ -19,7 +19,8 @@ npm run dev:web    # interface com recarga instantânea em http://localhost:5173
 | `npm run build` | Compila a interface |
 | `npm run agent` | Roda o agente (usa `.env`) |
 | `npm run migrate` | Aplica migrations pendentes |
-| `npm run create-admin -- usuario senha` | Cria/redefine administrador |
+| `npm run app` | Roda o código do aplicativo (servidor local + abre o navegador) |
+| `npm run app:build` | Gera o executável em `release/` |
 | `npm run lint` | ESLint |
 | `npm test` | Todos os testes (SQLite) |
 | `npm run test:pg` | Persistência + API no PostgreSQL (`TEST_DATABASE_URL` e `API_TEST_PG`) |
@@ -37,7 +38,7 @@ Usam o executor nativo `node:test` e `supertest`:
 | `tests/unit/collector.test.js` | Cálculos e leitores de cada SO, proteção de processos e **uma coleta real** na máquina que roda o teste |
 | `tests/unit/agent.test.js` | Assinatura agente↔servidor, configuração, buffer offline, comandos |
 | `tests/unit/frontend.test.js` | Paleta da cena para todos os temas/estações/horários |
-| `tests/api/auth.test.js` | Login, sessão, CSRF, papéis, troca de senha, rate limit, cabeçalhos |
+| `tests/api/local.test.js` | Sem login: só localhost, proteção contra CSRF e DNS rebinding, expulsão só local, tabelas de login removidas |
 | `tests/api/api.test.js` | Todos os endpoints, agentes (assinatura, replay, despedida, sem sinal), histórico, diário, missões, conquistas, alertas e canais, segredos, processos e expulsão (com um processo real descartável), compatibilidade |
 | `tests/integration/persistence.test.js` | Migrations, deduplicação, agregação ponderada, retenção e reinício do servidor no mesmo banco |
 
@@ -55,13 +56,15 @@ API_TEST_PG=postgres://postgres:stardew@localhost:5432/postgres npm run test:pg
 
 1. **test** (Ubuntu Node 22 e 24, Windows Node 24): `npm ci` → lint → testes → build;
 2. **postgres**: suíte de persistência e API com um serviço PostgreSQL 17;
-3. **docker**: build das imagens do servidor e do agente.
+3. **docker**: build das imagens do servidor e do agente;
+4. **app**: gera o executável no Windows e no Linux, testa se ele sobe e responde e publica como artefato;
+5. **release** (tags `v*`): cria a Release do GitHub com os executáveis.
 
 ## Convenções
 
 - Código em módulos ES; regras de negócio puras em `shared/` (fáceis de testar).
 - Sensor ausente = `null`. Nunca preencher com valores fictícios.
 - Toda entrada da API passa por um esquema zod (`backend/src/schemas.js`).
-- Toda operação administrativa registra auditoria.
+- Toda alteração relevante registra auditoria.
 - Mudanças no banco = nova migration em `database/migrations/` (nunca editar uma já publicada).
 - Antes de abrir um PR: `npm run check`.

@@ -16,6 +16,8 @@ export const SETTING_DEFAULTS = {
   appearance: DEFAULT_APPEARANCE,
   retention: DEFAULT_RETENTION,
   festivals: DEFAULT_FESTIVALS,
+  // preferências visuais deste computador (tema da interface, sons, fazenda selecionada...)
+  preferences: { sound: false, music: false, alertSound: false, uiTheme: 'auto', selectedMachine: null, reducedMotion: false },
 };
 
 export const SECRET_KEYS = [

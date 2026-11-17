@@ -1,5 +1,7 @@
 # Agente de monitoramento
 
+> Opcional. Para monitorar só o computador onde você usa o painel, basta o [aplicativo](aplicativo.md).
+
 O agente é um programa leve (Node.js + `systeminformation`) que roda em cada máquina monitorada:
 
 - coleta as métricas localmente (o mesmo coletor que o servidor usa para a própria máquina);
@@ -12,7 +14,7 @@ Consumo típico: ~40 MB de RAM e menos de 1% de CPU com intervalo de 10 s. No Wi
 
 ## 1. Registrar a máquina
 
-No painel, como administrador: **Pelican Town > + Registrar fazenda**. Escolha nome e tema. O token aparece **uma única vez**; o servidor guarda apenas o hash.
+No computador central, abra o painel e vá em **Pelican Town > + Registrar fazenda**. O central precisa estar rodando com `HOST=0.0.0.0` para aceitar conexões de outras máquinas (o painel continua só local). Escolha nome e tema. O token aparece **uma única vez**; o servidor guarda apenas o hash.
 
 ## 2. Instalar na máquina monitorada
 

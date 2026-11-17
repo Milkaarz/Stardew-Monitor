@@ -1,16 +1,16 @@
 /**
- * Casca do aplicativo: autenticação, barra superior, navegação e roteamento.
+ * Casca do aplicativo: carregamento inicial, barra superior, navegação e roteamento.
+ * Sem login: o painel roda só neste computador.
  */
 import { useEffect } from 'preact/hooks';
 import { getSeason, SEASON_LABELS } from '@stardew-monitor/shared';
 import { api } from './services/api.js';
-import { setState, state, useStore, selectedMachine } from './services/store.js';
+import { setState, useStore, selectedMachine } from './services/store.js';
 import { connectLive, disconnectLive } from './services/live.js';
-import { navigate, useRoute } from './services/router.js';
+import { useRoute } from './services/router.js';
 import { setSoundPrefs } from './audio/sound.js';
-import { Toasts, Loading, useNow } from './components/ui.jsx';
+import { Toasts, Loading, ErrorBox, Panel, useNow } from './components/ui.jsx';
 import { MachinePicker } from './components/MachinePicker.jsx';
-import { LoginPage } from './pages/LoginPage.jsx';
 import { FarmPage } from './pages/FarmPage.jsx';
 import { TownPage } from './pages/TownPage.jsx';
 import { HistoryPage } from './pages/HistoryPage.jsx';
@@ -33,12 +33,16 @@ const ROUTES = [
   { path: '/settings', label: 'Ajustes', icon: '⚙️', page: SettingsPage },
 ];
 
-export async function loadSession() {
+/** Carrega configurações e preferências; se o servidor local não responder, mostra o aviso. */
+export async function boot() {
+  setState({ status: 'loading', error: null });
   try {
-    const me = await api.get('/auth/me');
-    setState({ auth: { status: 'authenticated', user: me.user, csrf: me.csrf, features: me.features } });
+    const r = await api.get('/settings');
+    const prefs = r.settings.preferences || {};
+    setState({ settings: r.settings, secrets: r.secrets || null, prefs, status: 'ready', selectedId: prefs.selectedMachine != null ? Number(prefs.selectedMachine) || null : null });
+    setSoundPrefs(prefs);
   } catch (err) {
-    setState({ auth: { status: err.status === 401 ? 'anonymous' : 'error', user: null, csrf: null, features: {}, error: err.message } });
+    setState({ status: 'error', error: err.message });
   }
 }
 
@@ -95,27 +99,6 @@ function DateBox() {
   );
 }
 
-function UserMenu() {
-  const user = useStore((s) => s.auth.user);
-  const logout = async () => {
-    try {
-      await api.post('/auth/logout');
-    } finally {
-      disconnectLive();
-      setState({ auth: { ...state.auth, status: 'anonymous', user: null, csrf: null }, machines: {} });
-      navigate('/');
-    }
-  };
-  return (
-    <div class="row">
-      <span class="muted" title={user?.role === 'admin' ? 'Administrador' : 'Visitante (somente leitura)'}>
-        {user?.role === 'admin' ? '👑' : '👀'} {user?.username}
-      </span>
-      <button class="btn small light" onClick={logout}>Sair</button>
-    </div>
-  );
-}
-
 function Nav({ path }) {
   const unread = useStore((s) => s.unread);
   return (
@@ -131,40 +114,41 @@ function Nav({ path }) {
 }
 
 export function App() {
-  const auth = useStore((s) => s.auth);
+  const status = useStore((s) => s.status);
+  const error = useStore((s) => s.error);
   const route = useRoute();
   const machine = useStore(() => selectedMachine());
-  const uiTheme = useStore((s) => s.auth.user?.prefs?.uiTheme || 'auto');
+  const uiTheme = useStore((s) => s.prefs.uiTheme || 'auto');
+  const reducedMotion = useStore((s) => !!s.prefs.reducedMotion);
 
   useEffect(() => {
-    loadSession();
+    boot();
   }, []);
 
   useEffect(() => {
-    if (auth.status !== 'authenticated') return undefined;
+    if (status !== 'ready') return undefined;
     connectLive();
-    loadSettings();
     api.get('/notifications?limit=1').then((r) => setState({ unread: r.unread })).catch(() => {});
-    setSoundPrefs(auth.user?.prefs || {});
-    const sel = auth.user?.prefs?.selectedMachine;
-    if (sel != null) setState({ selectedId: Number(sel) || null });
     return () => disconnectLive();
-  }, [auth.status]);
+  }, [status]);
 
   // tema da interface: o da fazenda selecionada (ou o escolhido nas preferências)
   const theme = uiTheme === 'auto' ? machine?.machine?.theme || 'standard' : uiTheme;
   useEffect(() => {
     document.documentElement.dataset.ui = theme;
-    document.documentElement.dataset.motion = auth.user?.prefs?.reducedMotion ? 'reduced' : 'full';
-  }, [theme, auth.user?.prefs?.reducedMotion]);
+    document.documentElement.dataset.motion = reducedMotion ? 'reduced' : 'full';
+  }, [theme, reducedMotion]);
 
-  if (auth.status === 'loading') return <div class="shell"><Loading text="Abrindo o portão da fazenda..." /></div>;
-  if (auth.status !== 'authenticated') {
+  if (status === 'loading') return <div class="shell"><Loading text="Abrindo o portão da fazenda..." /></div>;
+  if (status === 'error') {
     return (
-      <>
-        <LoginPage error={auth.status === 'error' ? auth.error : null} features={auth.features} onRetry={loadSession} />
-        <Toasts />
-      </>
+      <div class="shell">
+        <header class="topbar"><Logo /></header>
+        <Panel title="🚪 Fazenda fechada">
+          <ErrorBox error={{ message: error }} onRetry={boot} />
+          <p>O painel não conseguiu falar com o Stardew Monitor neste computador. Abra o aplicativo de novo (ou rode <code>npm start</code>) e clique em "Tentar de novo".</p>
+        </Panel>
+      </div>
     );
   }
 
@@ -177,14 +161,13 @@ export function App() {
         <MachinePicker />
         <DateBox />
         <ConnectionBadge />
-        <UserMenu />
       </header>
       <Nav path={current.path} />
       <main class="page-enter" key={current.path}>
         <Page route={route} />
       </main>
       <footer class="footer muted">
-        Stardew Monitor v3 · fan-made, inspirado na estética de jogos de fazenda em pixel art · os números exibidos são leituras reais das máquinas
+        Stardew Monitor v3 · fan-made, inspirado na estética de jogos de fazenda em pixel art · os números exibidos são leituras reais deste computador
       </footer>
       <Toasts />
     </div>

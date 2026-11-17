@@ -5,7 +5,8 @@
 #                                           (e defina DATABASE_URL=postgres://stardew:stardew@postgres:5432/stardew no .env)
 #   Agente Linux em contêiner (opcional):   docker compose --profile agent up -d
 #
-# Copie .env.example para .env antes (ADMIN_PASSWORD e APP_SECRET, no mínimo).
+# Não há login: a porta é publicada só em 127.0.0.1 (este computador).
+# Para monitorar o seu PC de verdade, prefira o aplicativo baixável (veja o README).
 
 services:
   app:
@@ -19,7 +20,7 @@ services:
       NODE_ENV: production
       DATA_DIR: /app/data
     ports:
-      - "${PORT:-3001}:3001"
+      - "127.0.0.1:${PORT:-3001}:3001"
     volumes:
       - stardew-data:/app/data
 

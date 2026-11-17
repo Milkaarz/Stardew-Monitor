@@ -6,18 +6,28 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 // node:sqlite ainda emite um aviso "experimental" em algumas versões do Node; silencia só esse aviso.
-const originalEmit = process.emitWarning;
-process.emitWarning = function patched(warning, ...rest) {
-  const msg = typeof warning === 'string' ? warning : warning?.message;
-  if (msg && /SQLite is an experimental feature/i.test(msg)) return;
-  return originalEmit.call(process, warning, ...rest);
-};
-const { DatabaseSync } = await import('node:sqlite');
-process.emitWarning = originalEmit;
+// Carregado de forma síncrona (sem await no topo do módulo) para funcionar também no aplicativo empacotado.
+let DatabaseSync = null;
+function loadSqlite() {
+  if (DatabaseSync) return DatabaseSync;
+  const originalEmit = process.emitWarning;
+  process.emitWarning = function patched(warning, ...rest) {
+    const msg = typeof warning === 'string' ? warning : warning?.message;
+    if (msg && /SQLite is an experimental feature/i.test(msg)) return;
+    return originalEmit.call(process, warning, ...rest);
+  };
+  try {
+    ({ DatabaseSync } = process.getBuiltinModule('node:sqlite'));
+  } finally {
+    process.emitWarning = originalEmit;
+  }
+  return DatabaseSync;
+}
 
 export function openSqlite(file) {
   if (file !== ':memory:') fs.mkdirSync(path.dirname(path.resolve(file)), { recursive: true });
-  const db = new DatabaseSync(file);
+  const Db = loadSqlite();
+  const db = new Db(file);
   db.exec('PRAGMA journal_mode = WAL');
   db.exec('PRAGMA synchronous = NORMAL');
   db.exec('PRAGMA foreign_keys = ON');

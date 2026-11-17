@@ -1,12 +1,11 @@
 /** Quadro de Missões (lista de tarefas da v2, agora salva no servidor). */
 import { useState } from 'preact/hooks';
 import { api } from '../services/api.js';
-import { useStore, toast } from '../services/store.js';
+import { toast } from '../services/store.js';
 import { sfx } from '../audio/sound.js';
 import { Panel, Button, ErrorBox, Loading, Empty, useAsync } from '../components/ui.jsx';
 
 export function QuestsPage() {
-  const isAdmin = useStore((s) => s.auth.user?.role === 'admin');
   const { data, loading, error, reload, setData } = useAsync(() => api.get('/quests'), []);
   const [text, setText] = useState('');
   const [daily, setDaily] = useState(false);
@@ -52,20 +51,18 @@ export function QuestsPage() {
           {!quests.length && <li><Empty>Nenhuma missão por aqui.</Empty></li>}
           {quests.map((q) => (
             <li key={q.id} class={q.done ? 'done' : ''}>
-              <button class="icon-btn" disabled={!isAdmin} aria-pressed={q.done} aria-label={q.done ? 'Desmarcar' : 'Marcar como feita'} onClick={() => toggle(q)}>{q.done ? '☑' : '☐'}</button>
+              <button class="icon-btn" aria-pressed={q.done} aria-label={q.done ? 'Desmarcar' : 'Marcar como feita'} onClick={() => toggle(q)}>{q.done ? '☑' : '☐'}</button>
               <span class="text">{q.text}{q.daily && <small class="muted"> (diária)</small>}</span>
-              {isAdmin && <button class="icon-btn" style={{ color: 'var(--crit)' }} aria-label={`Apagar missão ${q.text}`} onClick={() => remove(q)}>✕</button>}
+              <button class="icon-btn" style={{ color: 'var(--crit)' }} aria-label={`Apagar missão ${q.text}`} onClick={() => remove(q)}>✕</button>
             </li>
           ))}
         </ul>
       )}
-      {isAdmin && (
-        <form class="row" onSubmit={add}>
-          <input class="input" style={{ flex: '1 1 200px', width: 'auto' }} maxLength={120} value={text} onInput={(e) => setText(e.currentTarget.value)} placeholder="Nova missão: limpar os filtros de poeira..." aria-label="Nova missão" />
-          <label class="check"><input type="checkbox" checked={daily} onChange={(e) => setDaily(e.currentTarget.checked)} /> diária</label>
-          <Button type="submit">Adicionar</Button>
-        </form>
-      )}
+      <form class="row" onSubmit={add}>
+        <input class="input" style={{ flex: '1 1 200px', width: 'auto' }} maxLength={120} value={text} onInput={(e) => setText(e.currentTarget.value)} placeholder="Nova missão: limpar os filtros de poeira..." aria-label="Nova missão" />
+        <label class="check"><input type="checkbox" checked={daily} onChange={(e) => setDaily(e.currentTarget.checked)} /> diária</label>
+        <Button type="submit">Adicionar</Button>
+      </form>
     </Panel>
   );
 }

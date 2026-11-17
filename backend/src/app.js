@@ -6,10 +6,9 @@ import path from 'node:path';
 import express, { Router } from 'express';
 import helmet from 'helmet';
 import { createRateLimiter } from './middleware/rateLimit.js';
-import { csrfProtect, loadSession, requireAuth } from './middleware/auth.js';
+import { localGuard } from './middleware/local.js';
 import { apiNotFound, errorHandler } from './middleware/errors.js';
 import { agentRoutes } from './routes/agent.js';
-import { authRoutes } from './routes/auth.js';
 import { machineRoutes } from './routes/machines.js';
 import { processRoutes } from './routes/processes.js';
 import { journalRoutes } from './routes/journal.js';
@@ -36,12 +35,12 @@ export function createApp(ctx) {
         frameAncestors: ["'none'"],
         baseUri: ["'self'"],
         formAction: ["'self'"],
-        // sem upgrade-insecure-requests: o painel precisa funcionar em http:// na rede local
+        // sem upgrade-insecure-requests: o painel roda em http://localhost
         upgradeInsecureRequests: null,
       },
     },
     crossOriginEmbedderPolicy: false,
-    hsts: config.isProduction,
+    hsts: false,
   }));
 
   const api = Router();
@@ -51,16 +50,11 @@ export function createApp(ctx) {
 
   api.use(express.json({ limit: '256kb' }));
   api.use(createRateLimiter({ windowMs: 60e3, max: config.rateLimit.apiPerMin, key: (req) => `api|${req.ip}` }));
-  api.use(loadSession(ctx.auth));
-  api.use(csrfProtect);
+  // painel local: só localhost, e alterações só vindas do próprio painel
+  api.use(localGuard({ allowedHosts: config.allowedHosts }));
 
-  // sem login
   api.use(publicRoutes(ctx));
   api.use(legacyRoutes(ctx));
-  api.use(authRoutes(ctx));
-
-  // com login
-  api.use(requireAuth);
   api.use(streamRoutes(ctx));
   api.use(machineRoutes(ctx));
   api.use(processRoutes(ctx));
@@ -71,8 +65,10 @@ export function createApp(ctx) {
 
   app.use('/api', api);
 
-  // interface (build do Vite)
-  if (fs.existsSync(path.join(config.staticDir, 'index.html'))) {
+  // interface: embutida no aplicativo (ctx.staticHandler) ou do build do Vite
+  if (ctx.staticHandler) {
+    app.use(ctx.staticHandler);
+  } else if (fs.existsSync(path.join(config.staticDir, 'index.html'))) {
     app.use('/assets', express.static(path.join(config.staticDir, 'assets'), { immutable: true, maxAge: '365d', index: false }));
     app.use(express.static(config.staticDir, { index: 'index.html', maxAge: 0 }));
   } else {

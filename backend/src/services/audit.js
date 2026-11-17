@@ -1,4 +1,4 @@
-/** Registro de operações administrativas (quem fez o quê, quando, de onde e se deu certo). */
+/** Registro de operações administrativas (o quê, quando, de onde e se deu certo). */
 import { parseJson } from '../lib/json.js';
 
 export class AuditService {

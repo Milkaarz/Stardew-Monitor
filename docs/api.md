@@ -2,22 +2,22 @@
 
 Base: `/api`. Respostas em JSON. Erros: `{ "error": "mensagem", "issues": [...] }`.
 
-## Autenticação
+## Acesso (sem login)
 
-- **Painel**: `POST /api/auth/login` cria um cookie de sessão `sm_session` (HttpOnly, SameSite=Strict) e devolve um `csrf`. Toda requisição que altera dados (POST/PUT/PATCH/DELETE) precisa do cabeçalho `X-CSRF-Token: <csrf>`.
-- **Agentes**: `Authorization: Bearer <token>` + `X-Agent-Timestamp` (ms) + `X-Agent-Signature` = HMAC-SHA256(chave = sha256(token) em hex, mensagem = `"<timestamp>.<corpo>"`).
-- Papéis: **admin** (tudo) e **viewer** (somente leitura).
+O painel roda no próprio computador e não tem login:
 
-## Sem login
+- só responde com `Host` = `localhost`, `127.0.0.1` ou `[::1]` (ou nomes em `ALLOWED_HOSTS`);
+- toda alteração (POST/PUT/PATCH/DELETE) precisa do cabeçalho `X-Stardew-Monitor: 1` e, se houver `Origin`, ele precisa ser local;
+- `POST /processes/kill` só é aceito a partir do próprio computador (loopback).
+
+**Agentes** usam autenticação própria: `Authorization: Bearer <token>` + `X-Agent-Timestamp` (ms) + `X-Agent-Signature` = HMAC-SHA256(chave = sha256(token) em hex, mensagem = `"<timestamp>.<corpo>"`).
+
+## Utilitárias
 
 | Método | Rota | Descrição |
 |---|---|---|
-| GET | `/health` | Saúde do servidor |
-| POST | `/auth/login` | `{ username, password }` → `{ user, csrf }` (limite: 10 tentativas / 15 min) |
-| POST | `/auth/logout` | Encerra a sessão |
-| GET | `/auth/me` | Usuário atual + `csrf` + recursos ativos (401 se anônimo) |
-| GET | `/public/town` | Só se `PUBLIC_DASHBOARD=true`: nome da fazenda, status e percentuais (sem hostname/hardware/processos) |
-| GET | `/dados` | Formato da v2 (compatibilidade). Sessão **ou** `LEGACY_API_TOKEN` (Basic ou `X-Token`) |
+| GET | `/health` | `{ ok, app: "stardew-monitor", uptimeSec }` |
+| GET | `/dados` | Formato da v2 (compatibilidade com o agente PHP) |
 
 ## Agentes
 
@@ -49,43 +49,41 @@ Erros: 401 (token/assinatura/relógio), 409 (replay), 400 (leitura inválida), 4
 
 Qualquer sensor pode ser `null`.
 
-## Com login
+## Painel
 
-| Método | Rota | Papel | Descrição |
-|---|---|---|---|
-| GET | `/metrics?machine=id\|uid` | todos | Leitura atual (padrão: máquina local) + médias recentes + tempo acumulado |
-| GET | `/history?machine=&range=15m\|1h\|6h\|24h\|7d\|30d` | todos | Série com média e máximo de cada métrica |
-| GET | `/stream` | todos | Server-Sent Events (abaixo) |
-| GET | `/machines` | todos | Lista de fazendas com status (`ok`, `warn`, `crit`, `offline`) |
-| GET | `/machines/:id` | todos | Uma fazenda |
-| POST | `/machines` | admin | `{ name, farmName?, theme }` → `{ machine, token }` (token mostrado uma vez) |
-| PATCH | `/machines/:id` | admin | `{ name?, farmName?, theme? }` |
-| POST | `/machines/:id/token` | admin | Gera novo token (o antigo deixa de valer) |
-| DELETE | `/machines/:id` | admin | Remove a fazenda e seu histórico |
-| GET | `/processes?machine=&sort=cpu\|mem\|name\|pid&order=&limit=10\|25\|50\|100&q=&filter=all\|active\|heavy\|user` | todos | Processos |
-| POST | `/processes/kill` | admin | `{ machine?, pid, name, password, confirm: true }` — "Expulsar morador" |
-| GET | `/notes?q=&category=&machine=` | todos | Diário |
-| POST | `/notes` | admin | `{ title, body, category, machineId? }` |
-| PUT | `/notes/:id` | admin | Edita |
-| DELETE | `/notes/:id` | admin | Apaga |
-| GET/POST/PATCH/DELETE | `/quests[/:id]` | leitura: todos | Quadro de Missões |
-| GET | `/achievements?machine=` | todos | Conquistas, progresso e histórico |
-| GET | `/notifications?limit=&offset=&kind=&category=&machine=` | todos | Histórico de avisos |
-| POST | `/notifications/read` | todos | Marca como lidos |
-| DELETE | `/notifications` | admin | Limpa o histórico |
-| POST | `/notifications/test/:channel` | admin | Testa `discord`, `telegram` ou `email` |
-| GET | `/settings` | todos | Configurações (admin também recebe o **status** dos segredos, nunca os valores) |
-| PUT | `/settings/:section` | admin | `thresholds`, `notifications`, `weather`, `achievements`, `appearance`, `retention`, `festivals` |
-| DELETE | `/settings/:section` | admin | Restaura o padrão |
-| PUT | `/secrets` | admin | Grava credenciais (só escrita; `null` apaga) |
-| PUT | `/auth/password` | todos | `{ currentPassword, newPassword }` |
-| PUT | `/auth/prefs` | todos | Preferências visuais da conta |
-| GET/POST/PATCH/DELETE | `/users[/:id]`, POST `/users/:id/password` | admin | Usuários |
-| GET | `/audit?limit=&offset=&action=` | admin | Registro de auditoria |
+| Método | Rota | Descrição |
+|---|---|---|
+| GET | `/metrics?machine=id\|uid` | Leitura atual (padrão: máquina local) + médias recentes + tempo acumulado |
+| GET | `/history?machine=&range=15m\|1h\|6h\|24h\|7d\|30d` | Série com média e máximo de cada métrica |
+| GET | `/stream` | Server-Sent Events (abaixo) |
+| GET | `/machines` | Lista de fazendas com status (`ok`, `warn`, `crit`, `offline`) |
+| GET | `/machines/:id` | Uma fazenda |
+| POST | `/machines` | `{ name, farmName?, theme }` → `{ machine, token }` (token mostrado uma vez) |
+| PATCH | `/machines/:id` | `{ name?, farmName?, theme? }` |
+| POST | `/machines/:id/token` | Gera novo token (o antigo deixa de valer) |
+| DELETE | `/machines/:id` | Remove a fazenda e seu histórico |
+| GET | `/processes?machine=&sort=cpu\|mem\|name\|pid&order=&limit=10\|25\|50\|100&q=&filter=all\|active\|heavy\|user` | Processos |
+| POST | `/processes/kill` | `{ machine?, pid, name, confirm: true }` — "Expulsar morador" |
+| GET | `/notes?q=&category=&machine=` | Diário |
+| POST | `/notes` | `{ title, body, category, machineId? }` |
+| PUT | `/notes/:id` | Edita |
+| DELETE | `/notes/:id` | Apaga |
+| GET/POST/PATCH/DELETE | `/quests[/:id]` | Quadro de Missões |
+| GET | `/achievements?machine=` | Conquistas, progresso e histórico |
+| GET | `/notifications?limit=&offset=&kind=&category=&machine=` | Histórico de avisos |
+| POST | `/notifications/read` | Marca como lidos |
+| DELETE | `/notifications` | Limpa o histórico |
+| POST | `/notifications/test/:channel` | Testa `discord`, `telegram` ou `email` |
+| GET | `/settings` | Configurações + **status** dos segredos (nunca os valores) |
+| PUT | `/settings/:section` | `thresholds`, `notifications`, `weather`, `achievements`, `appearance`, `retention`, `festivals` |
+| DELETE | `/settings/:section` | Restaura o padrão |
+| PUT | `/secrets` | Grava credenciais (só escrita; `null` apaga) |
+| PUT | `/preferences` | Preferências visuais (atualização parcial: `sound`, `music`, `alertSound`, `uiTheme`, `selectedMachine`, `reducedMotion`) |
+| GET | `/audit?limit=&offset=&action=` | Registro de auditoria |
 
 ## Tempo real (SSE)
 
-`GET /api/stream` (com o cookie de sessão). Eventos:
+`GET /api/stream`. Eventos:
 
 | Evento | Dados |
 |---|---|
@@ -94,7 +92,7 @@ Qualquer sensor pode ser `null`.
 | `machine` | `{ id, action: created\|updated\|removed\|status }` |
 | `notification` | Aviso novo (alerta, recuperação, sistema) |
 | `achievement` | Conquista desbloqueada |
-| `command` | Resultado de comando remoto (admin) |
+| `command` | Resultado de comando remoto |
 | `settings` | Alguma configuração mudou |
 
 `LivePayload = { machine, snapshot (sem processos), derived: { cpuAvg1m, cpuAvg5m }, receivedAt, farmSeconds }`.
@@ -102,7 +100,7 @@ Qualquer sensor pode ser `null`.
 Exemplo:
 
 ```bash
-curl -c cj -H 'Content-Type: application/json' -d '{"username":"admin","password":"..."}' http://localhost:3001/api/auth/login
-curl -b cj http://localhost:3001/api/metrics
-curl -b cj -N http://localhost:3001/api/stream
+curl http://localhost:3001/api/metrics
+curl -N http://localhost:3001/api/stream
+curl -X POST -H 'X-Stardew-Monitor: 1' -H 'Content-Type: application/json' -d '{"text":"Limpar a poeira"}' http://localhost:3001/api/quests
 ```

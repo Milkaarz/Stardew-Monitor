@@ -7,7 +7,7 @@ Use antes de publicar alterações ou uma nova versão.
 - [ ] `npm run check` passa (lint + testes + build).
 - [ ] Mudanças no banco estão numa **nova** migration.
 - [ ] Toda entrada nova da API tem esquema de validação.
-- [ ] Ações administrativas novas registram auditoria.
+- [ ] Alterações novas registram auditoria.
 - [ ] Nenhum valor fictício: sensor ausente aparece como indisponível.
 - [ ] Nada de segredo no frontend, em logs ou em respostas da API.
 
@@ -26,7 +26,6 @@ Use antes de publicar alterações ou uma nova versão.
 
 ## Publicação
 
-- [ ] CI verde (Linux, Windows, PostgreSQL, Docker).
-- [ ] `APP_SECRET` e `ADMIN_PASSWORD` definidos no ambiente de produção.
-- [ ] HTTPS na frente do servidor; agentes usando `https://`.
-- [ ] Backup do banco antes de atualizar.
+- [ ] CI verde (Linux, Windows, PostgreSQL, Docker, executáveis).
+- [ ] Executável testado: abre, mostra a fazenda deste computador e fecha com a janela.
+- [ ] Tag `v*` criada para publicar a Release.

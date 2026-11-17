@@ -1,11 +1,9 @@
 import { Router } from 'express';
 import { validate } from '../middleware/validate.js';
-import { requireAdmin } from '../middleware/auth.js';
 import { machineCreateSchema, machineUpdateSchema, historyQuerySchema } from '../schemas.js';
 
 export function machineRoutes({ machines, achievements, alerts, history, audit }) {
   const r = Router();
-  const isAdmin = (req) => req.user?.role === 'admin';
 
   const find = (req, res) => {
     const m = machines.resolve(req.params.id ?? req.query.machine);
@@ -30,39 +28,39 @@ export function machineRoutes({ machines, achievements, alerts, history, audit }
   });
 
   r.get('/machines', (req, res) => {
-    res.json({ machines: machines.list().map((m) => machines.toPublic(m, { admin: isAdmin(req) })) });
+    res.json({ machines: machines.list().map((m) => machines.toPublic(m, { admin: true })) });
   });
 
   r.get('/machines/:id', (req, res) => {
     const m = find(req, res);
-    if (m) res.json({ machine: machines.toPublic(m, { admin: isAdmin(req) }) });
+    if (m) res.json({ machine: machines.toPublic(m, { admin: true }) });
   });
 
-  r.post('/machines', requireAdmin, validate(machineCreateSchema), async (req, res) => {
+  r.post('/machines', validate(machineCreateSchema), async (req, res) => {
     const { machine, token } = await machines.create(req.body);
-    await audit.log({ user: req.user, action: 'machine.create', target: machine.row.farm_name, ip: req.ip });
+    await audit.log({ action: 'machine.create', target: machine.row.farm_name, ip: req.ip });
     await achievements.checkGlobal(machines.list().length);
     res.status(201).json({ machine: machines.toPublic(machine, { admin: true }), token });
   });
 
-  r.patch('/machines/:id', requireAdmin, validate(machineUpdateSchema), async (req, res) => {
+  r.patch('/machines/:id', validate(machineUpdateSchema), async (req, res) => {
     const m = find(req, res);
     if (!m) return;
     await machines.update(m.row.id, req.body);
-    await audit.log({ user: req.user, action: 'machine.update', target: m.row.farm_name, details: req.body, ip: req.ip });
+    await audit.log({ action: 'machine.update', target: m.row.farm_name, details: req.body, ip: req.ip });
     res.json({ machine: machines.toPublic(m, { admin: true }) });
   });
 
-  r.post('/machines/:id/token', requireAdmin, async (req, res) => {
+  r.post('/machines/:id/token', async (req, res) => {
     const m = find(req, res);
     if (!m) return;
     if (m.row.is_local) return res.status(400).json({ error: 'A máquina local não usa token.' });
     const token = await machines.rotateToken(m.row.id);
-    await audit.log({ user: req.user, action: 'machine.token.rotate', target: m.row.farm_name, ip: req.ip });
+    await audit.log({ action: 'machine.token.rotate', target: m.row.farm_name, ip: req.ip });
     res.json({ token });
   });
 
-  r.delete('/machines/:id', requireAdmin, async (req, res) => {
+  r.delete('/machines/:id', async (req, res) => {
     const m = find(req, res);
     if (!m) return;
     if (m.row.is_local) return res.status(400).json({ error: 'A máquina local não pode ser removida (desative com LOCAL_MONITOR=false).' });
@@ -70,7 +68,7 @@ export function machineRoutes({ machines, achievements, alerts, history, audit }
     await machines.remove(m.row.id);
     alerts.forget(m.row.id);
     achievements.forget(m.row.id);
-    await audit.log({ user: req.user, action: 'machine.delete', target: name, ip: req.ip });
+    await audit.log({ action: 'machine.delete', target: name, ip: req.ip });
     res.json({ ok: true });
   });
 

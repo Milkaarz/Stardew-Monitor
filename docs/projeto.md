@@ -22,17 +22,18 @@ Monitorar uma ou várias máquinas com dados reais, coletados continuamente, e a
 | RF06 | Festivais automáticos por data configurável, com decorações | `shared/src/seasons.js`, `Weather.jsx` |
 | RF07 | Alertas configuráveis por categoria, sem repetição, com intervalo mínimo, histórico e envio por Discord, Telegram e e-mail | `shared/src/alerts.js`, `backend/src/services/alerts.js`, `notifier/` |
 | RF08 | Cartão de status com mensagens contextuais e sem repetição excessiva | `shared/src/messages.js` |
-| RF09 | Página de processos com ordenação, filtros, pesquisa e quantidade; encerramento autenticado, confirmado, protegido e auditado | `ProcessesPage.jsx`, `services/processes.js` |
+| RF09 | Página de processos com ordenação, filtros, pesquisa e quantidade; encerramento confirmado, só local, protegido e auditado | `ProcessesPage.jsx`, `services/processes.js` |
 | RF10 | Diário persistente com categorias, pesquisa, histórico por data e salvamento automático | `DiaryPage.jsx`, `routes/journal.js` |
 | RF11 | Temas: Padrão, Floresta, Praia, Colina, Gengibre e Minas | `farm/palette.js`, `styles/base.css` |
 | RF12 | Várias máquinas com agente, tokens individuais e mapa Pelican Town (verde/amarelo/vermelho/cinza) | `agent/`, `TownPage.jsx` |
 | RF13 | Histórico com períodos de 15 min a 30 dias e agregação | `services/history.js`, `HistoryPage.jsx` |
 | RF14 | Quadro de Missões (tarefas, inclusive diárias) — herdado da v2 | `QuestsPage.jsx` |
 | RF15 | Compatibilidade com a v2 (`/api/dados` e hospedagem PHP) | `routes/public.js`, `legacy/` |
+| RF16 | Aplicativo baixável que roda no computador e coleta os dados dele, sem login | `app/`, `scripts/build-app.mjs` |
 
 ## 4. Requisitos não funcionais
 
-- **Segurança:** autenticação, papéis, CSRF, rate limiting, validação, HMAC nos agentes, segredos criptografados, auditoria ([seguranca.md](seguranca.md)).
+- **Segurança:** sem login, painel só local (127.0.0.1, proteção contra CSRF e DNS rebinding), rate limiting, validação, HMAC nos agentes, segredos criptografados, auditoria ([seguranca.md](seguranca.md)).
 - **Desempenho:** coleta em camadas; processo auxiliar persistente no Windows; agregação incremental; interface sem bibliotecas pesadas (~50 KB de JS comprimido).
 - **Compatibilidade:** Windows e Linux (macOS quando possível); SQLite e PostgreSQL.
 - **Acessibilidade:** elementos da fazenda acessíveis por teclado e com descrição; gráficos com alternativa em tabela; animações reduzidas.
@@ -41,4 +42,4 @@ Monitorar uma ou várias máquinas com dados reais, coletados continuamente, e a
 
 ## 5. Limites conhecidos
 
-As métricas pertencem à máquina onde o coletor roda. Uma hospedagem remota mostra o próprio servidor; para monitorar um computador pessoal, é preciso o agente instalado nele ([deploy.md](deploy.md)). Sensores de temperatura, ventoinhas e GPU dependem do sistema operacional e do hardware.
+As métricas pertencem à máquina onde o coletor roda; por isso o Stardew Monitor é um aplicativo local, sem modo hospedado ([deploy.md](deploy.md)). Sensores de temperatura, ventoinhas e GPU dependem do sistema operacional e do hardware.

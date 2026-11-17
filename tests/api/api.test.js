@@ -4,7 +4,7 @@ import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import request from 'supertest';
-import { makeApp, login, agentPost, fakeCollector, ADMIN } from '../helpers/app.js';
+import { makeApp, client, agentPost, fakeCollector } from '../helpers/app.js';
 import { snapshot } from '../helpers/fixtures.js';
 
 let t;
@@ -13,7 +13,7 @@ let collector;
 before(async () => {
   collector = fakeCollector();
   t = await makeApp({ collector });
-  admin = await login(t.app);
+  admin = client(t.app);
   await t.ctx.ingest.ingest(t.local, [snapshot({ cpu: 33, ram: 44 })]);
 });
 after(() => t.close());
@@ -59,7 +59,7 @@ test('agente: token errado, assinatura adulterada, replay e dados inválidos sã
   // validação do conteúdo
   await agentPost(t.app, body.token, { samples: [{ ts: 'ontem', cpu: { load: 'muito' } }] }).expect(400);
   await agentPost(t.app, body.token, { samples: Array.from({ length: 101 }, () => snapshot()) }).expect(400);
-  // sessão de navegador não serve para o endpoint do agente
+  // o painel não serve para o endpoint do agente (exige token)
   await admin.post('/api/agent/metrics').send({ samples: [snapshot()] }).expect(401);
 });
 
@@ -221,7 +221,7 @@ test('processos: ordenação, filtro, limite e proteção', async () => {
   assert.ok(byCpu.body.items[0].runtimeSec > 0);
 });
 
-test('expulsar morador: senha, confirmação, proteção, PID trocado e auditoria', async () => {
+test('expulsar morador: confirmação, proteção, PID trocado e auditoria', async () => {
   // processo real e descartável para o teste
   const child = spawn(process.execPath, ['-e', 'setTimeout(()=>{}, 60000)'], { stdio: 'ignore' });
   const exited = new Promise((r) => child.on('exit', r));
@@ -229,24 +229,23 @@ test('expulsar morador: senha, confirmação, proteção, PID trocado e auditori
     { pid: child.pid, name: 'node-descartavel', cpu: 0, mem: 0 },
     { pid: 4, name: 'System', cpu: 0, mem: 0 },
   ];
-  const kill = (body) => admin.post('/api/processes/kill').send({ pid: child.pid, name: 'node-descartavel', password: ADMIN.password, confirm: true, ...body });
+  const kill = (body) => admin.post('/api/processes/kill').send({ pid: child.pid, name: 'node-descartavel', confirm: true, ...body });
   await kill({ confirm: false }).expect(400);
-  await kill({ password: 'senha-errada-123' }).expect(401);
   await kill({ name: 'outro-processo' }).expect(409);
-  await admin.post('/api/processes/kill').send({ pid: 4, name: 'System', password: ADMIN.password, confirm: true }).expect(403);
+  await admin.post('/api/processes/kill').send({ pid: 4, name: 'System', confirm: true }).expect(403);
   const ok = await kill({}).expect(200);
   assert.equal(ok.body.mode, 'local');
   await exited;
   const audit = await admin.get('/api/audit?action=process.kill').expect(200);
   assert.ok(audit.body.entries.some((e) => e.success && e.target.endsWith(`:${child.pid}`)));
-  assert.ok(audit.body.entries.some((e) => !e.success && e.details.reason === 'senha incorreta'));
+  assert.ok(audit.body.entries.some((e) => !e.success && e.details.code === 'mismatch'));
 });
 
 test('expulsão desativada por configuração', async () => {
   const off = await makeApp({ config: { allowProcessKill: false } });
   try {
-    const s = await login(off.app);
-    await s.post('/api/processes/kill').send({ pid: 12345, name: 'x', password: ADMIN.password, confirm: true }).expect(403);
+    const s = client(off.app);
+    await s.post('/api/processes/kill').send({ pid: 12345, name: 'x', confirm: true }).expect(403);
   } finally {
     await off.close();
   }
@@ -258,7 +257,7 @@ test('expulsão remota vira comando para o agente, que devolve o resultado', asy
   const list = await admin.get(`/api/processes?machine=${body.machine.id}&limit=10`).expect(200);
   assert.equal(list.body.live, false);
   assert.equal(list.body.items[0].name, 'app-remoto');
-  const r = await admin.post('/api/processes/kill').send({ machine: body.machine.id, pid: 4242, name: 'app-remoto', password: ADMIN.password, confirm: true }).expect(200);
+  const r = await admin.post('/api/processes/kill').send({ machine: body.machine.id, pid: 4242, name: 'app-remoto', confirm: true }).expect(200);
   assert.equal(r.body.mode, 'remote');
   const res = await agentPost(t.app, body.token, { samples: [snapshot()] }).expect(200);
   assert.equal(res.body.sendProcesses, true);
@@ -267,27 +266,22 @@ test('expulsão remota vira comando para o agente, que devolve o resultado', asy
   assert.equal((await t.ctx.commands.get(res.body.commands[0].id)).status, 'failed');
 });
 
-test('compatibilidade: /api/dados (formato v2) e painel público', async () => {
-  const legacy = await admin.get('/api/dados').expect(200);
+test('compatibilidade: /api/dados (formato v2) sem token', async () => {
+  const legacy = await request(t.app).get('/api/dados').expect(200);
   assert.ok('avgCpu' in legacy.body && 'ramUsage' in legacy.body && Array.isArray(legacy.body.disks));
-  await request(t.app).get('/api/dados').expect(401);
   await request(t.app).get('/api/public/town').expect(404);
+});
 
-  const pub = await makeApp({ config: { publicDashboard: true, legacyApiToken: 'token-legado-123' } });
-  try {
-    await pub.ctx.ingest.ingest(pub.local, [snapshot()]);
-    const town = await request(pub.app).get('/api/public/town').expect(200);
-    const text = JSON.stringify(town.body);
-    assert.ok(!text.includes('teste') && !text.includes('hostname'), 'sem hostname/hardware no painel público');
-    await request(pub.app).get('/api/dados').set('X-Token', 'token-legado-123').expect(200);
-    await request(pub.app).get('/api/dados').auth('qualquer', 'token-legado-123').expect(200);
-    await request(pub.app).get('/api/dados').set('X-Token', 'errado').expect(401);
-  } finally {
-    await pub.close();
-  }
+test('preferências visuais salvas no computador (atualização parcial)', async () => {
+  const r = await admin.put('/api/preferences').send({ sound: true, uiTheme: 'mines' }).expect(200);
+  assert.equal(r.body.preferences.sound, true);
+  assert.equal(r.body.preferences.music, false);
+  await admin.put('/api/preferences').send({ uiTheme: 'tema-que-nao-existe' }).expect(400);
+  const s = await admin.get('/api/settings').expect(200);
+  assert.equal(s.body.settings.preferences.uiTheme, 'mines');
 });
 
 test('rota inexistente e JSON inválido', async () => {
   await admin.get('/api/nao-existe').expect(404);
-  await admin.agent.post('/api/notes').set('X-CSRF-Token', admin.csrf).set('Content-Type', 'application/json').send('{quebrado').expect(400);
+  await request(t.app).post('/api/notes').set('X-Stardew-Monitor', '1').set('Content-Type', 'application/json').send('{quebrado').expect(400);
 });

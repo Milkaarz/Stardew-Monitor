@@ -12,19 +12,15 @@ A versão 2 mostrava as métricas do seu PC num site PHP comum: um agente local 
 
 ## Usando com o servidor v3
 
-O servidor v3 mantém a rota `/api/dados` no formato antigo. Para o agente PHP conseguir lê-la:
-
-1. No `.env` do servidor: `LEGACY_API_TOKEN=um-token-forte`.
-2. No `.env` do agente legado:
+O servidor v3 mantém a rota `/api/dados` no formato antigo, sem token (ela só responde no próprio computador). No `.env` do agente legado:
 
 ```ini
 PAINEL_URL=https://seudominio.com/stardew/receber.php
 PAINEL_TOKEN=mesmo-token-do-receber-php
 PAINEL_INTERVALO=5
 PAINEL_LOCAL=http://localhost:3001
-PAINEL_SENHA=um-token-forte
 ```
 
-3. Rode `npm run agente:php` (ou `pm2 start ecosystem.config.cjs --only agente-php`).
+Depois rode `npm run agente:php` (ou `pm2 start ecosystem.config.cjs --only agente-php`).
 
-Esse modo mostra apenas o último estado (sem histórico, alertas, conquistas ou várias máquinas). Para isso, hospede o servidor v3 e use o agente novo ([deploy.md](deploy.md)).
+Esse modo mostra apenas o último estado (sem histórico, alertas, conquistas ou várias máquinas). Para isso, use o [aplicativo](aplicativo.md).
