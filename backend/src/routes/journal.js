@@ -1,12 +1,11 @@
 /** Diário da fazenda (changelog da máquina) e Quadro de Missões. */
 import { Router } from 'express';
 import { validate } from '../middleware/validate.js';
-import { requireAdmin } from '../middleware/auth.js';
 import { noteQuerySchema, noteSchema, questPatchSchema, questSchema } from '../schemas.js';
 
 const noteOut = (r) => ({
   id: r.id, machineId: r.machine_id, category: r.category, title: r.title, body: r.body,
-  createdAt: r.created_at, updatedAt: r.updated_at, author: r.author || null,
+  createdAt: r.created_at, updatedAt: r.updated_at,
 });
 
 const startOfToday = () => {
@@ -42,25 +41,25 @@ export function journalRoutes({ db, machines, achievements, audit }) {
       params.push(m ? m.row.id : -1);
     }
     const w = where.length ? `WHERE ${where.join(' AND ')}` : '';
-    const sql = `SELECT n.*, u.username AS author FROM notes n LEFT JOIN users u ON u.id = n.author_id ${w} ORDER BY n.created_at DESC, n.id DESC LIMIT ?`;
+    const sql = `SELECT n.* FROM notes n ${w} ORDER BY n.created_at DESC, n.id DESC LIMIT ?`;
     const rows = await db.all(sql, [...params, limit]);
     res.json({ notes: rows.map(noteOut) });
   });
 
-  r.post('/notes', requireAdmin, validate(noteSchema), async (req, res) => {
+  r.post('/notes', validate(noteSchema), async (req, res) => {
     const now = Date.now();
     const { title, body, category, machineId } = req.body;
     if (machineId != null && !machines.get(machineId)) return res.status(400).json({ error: 'Fazenda inválida.' });
     const id = await db.insert(
-      'INSERT INTO notes (machine_id, category, title, body, created_at, updated_at, author_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [machineId ?? null, category, title, body, now, now, req.user.id],
+      'INSERT INTO notes (machine_id, category, title, body, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
+      [machineId ?? null, category, title, body, now, now],
     );
     await achievements.checkGlobal(machines.list().length);
-    const row = await db.get('SELECT n.*, u.username AS author FROM notes n LEFT JOIN users u ON u.id = n.author_id WHERE n.id = ?', [id]);
+    const row = await db.get('SELECT n.* FROM notes n WHERE n.id = ?', [id]);
     res.status(201).json({ note: noteOut(row) });
   });
 
-  r.put('/notes/:id', requireAdmin, validate(noteSchema), async (req, res) => {
+  r.put('/notes/:id', validate(noteSchema), async (req, res) => {
     const id = Number(req.params.id);
     const { title, body, category, machineId } = req.body;
     const result = await db.run(
@@ -68,16 +67,16 @@ export function journalRoutes({ db, machines, achievements, audit }) {
       [title, body, category, machineId ?? null, Date.now(), id],
     );
     if (!result.changes) return res.status(404).json({ error: 'Anotação não encontrada.' });
-    const row = await db.get('SELECT n.*, u.username AS author FROM notes n LEFT JOIN users u ON u.id = n.author_id WHERE n.id = ?', [id]);
+    const row = await db.get('SELECT n.* FROM notes n WHERE n.id = ?', [id]);
     res.json({ note: noteOut(row) });
   });
 
-  r.delete('/notes/:id', requireAdmin, async (req, res) => {
+  r.delete('/notes/:id', async (req, res) => {
     const id = Number(req.params.id);
     const row = await db.get('SELECT title FROM notes WHERE id = ?', [id]);
     if (!row) return res.status(404).json({ error: 'Anotação não encontrada.' });
     await db.run('DELETE FROM notes WHERE id = ?', [id]);
-    await audit.log({ user: req.user, action: 'note.delete', target: row.title, ip: req.ip });
+    await audit.log({ action: 'note.delete', target: row.title, ip: req.ip });
     res.json({ ok: true });
   });
 
@@ -88,12 +87,12 @@ export function journalRoutes({ db, machines, achievements, audit }) {
     res.json({ quests: rows.map(questOut) });
   });
 
-  r.post('/quests', requireAdmin, validate(questSchema), async (req, res) => {
+  r.post('/quests', validate(questSchema), async (req, res) => {
     const id = await db.insert('INSERT INTO quests (text, daily, created_at) VALUES (?, ?, ?)', [req.body.text, req.body.daily ? 1 : 0, Date.now()]);
     res.status(201).json({ quest: questOut(await db.get('SELECT * FROM quests WHERE id = ?', [id])) });
   });
 
-  r.patch('/quests/:id', requireAdmin, validate(questPatchSchema), async (req, res) => {
+  r.patch('/quests/:id', validate(questPatchSchema), async (req, res) => {
     const id = Number(req.params.id);
     const row = await db.get('SELECT * FROM quests WHERE id = ?', [id]);
     if (!row) return res.status(404).json({ error: 'Missão não encontrada.' });
@@ -104,7 +103,7 @@ export function journalRoutes({ db, machines, achievements, audit }) {
     res.json({ quest: questOut(await db.get('SELECT * FROM quests WHERE id = ?', [id])) });
   });
 
-  r.delete('/quests/:id', requireAdmin, async (req, res) => {
+  r.delete('/quests/:id', async (req, res) => {
     const result = await db.run('DELETE FROM quests WHERE id = ?', [Number(req.params.id)]);
     if (!result.changes) return res.status(404).json({ error: 'Missão não encontrada.' });
     res.json({ ok: true });

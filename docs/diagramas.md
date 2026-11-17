@@ -30,7 +30,7 @@ flowchart LR
   AL --> DB
   I --> CQ --> DB
   I --> SSE --> B
-  B -- REST + cookie + CSRF --> API
+  B -- REST localhost + cabeçalho do painel --> API
 ```
 
 ## Leitura de um agente
@@ -54,11 +54,11 @@ sequenceDiagram
 
 ```mermaid
 flowchart TD
-  U[Admin clica Expulsar] --> C{Confirmou e digitou a senha?}
+  U[Clica Expulsar] --> C{Confirmou?}
   C -- não --> X[Cancelado]
-  C -- sim --> P[POST /api/processes/kill + CSRF]
-  P --> R{Senha correta?}
-  R -- não --> A1[401 + auditoria]
+  C -- sim --> P[POST /api/processes/kill + cabeçalho do painel]
+  P --> R{Pedido veio deste computador?}
+  R -- não --> A1[403]
   R -- sim --> L{Máquina local?}
   L -- sim --> V{PID ainda é o mesmo processo e não é protegido?}
   V -- não --> A2[403/409 + auditoria]

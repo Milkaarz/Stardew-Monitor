@@ -1,6 +1,6 @@
 /**
  * Moradores de Pelican Town = processos do sistema.
- * "Expulsar morador" (encerrar processo): só administradores, com senha e confirmação.
+ * "Expulsar morador" (encerrar processo): com confirmação, só neste computador e nunca em processos essenciais.
  */
 import { useEffect, useState } from 'preact/hooks';
 import { PROCESS_LIMITS, formatBytes, formatDuration } from '@stardew-monitor/shared';
@@ -11,7 +11,6 @@ import { sfx } from '../audio/sound.js';
 import { Panel, Button, Field, Modal, ErrorBox, Loading, Empty, useAsync, useInterval, timeAgo } from '../components/ui.jsx';
 
 function KickDialog({ proc, machine, onClose, onDone }) {
-  const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
@@ -20,7 +19,7 @@ function KickDialog({ proc, machine, onClose, onDone }) {
     setBusy(true);
     setError(null);
     try {
-      const r = await api.post('/processes/kill', { machine: machine.id, pid: proc.pid, name: proc.name, password, confirm: true });
+      const r = await api.post('/processes/kill', { machine: machine.id, pid: proc.pid, name: proc.name, confirm: true });
       sfx.kick();
       toast({
         title: r.mode === 'remote' ? 'Ordem enviada ao agente' : 'Morador expulso',
@@ -40,13 +39,10 @@ function KickDialog({ proc, machine, onClose, onDone }) {
       <form class="stack" onSubmit={submit}>
         <p>Você vai encerrar <b>{proc.name}</b> (PID {proc.pid}) na fazenda <b>{machine.farmName}</b>.</p>
         <div class="notice warn">Trabalho não salvo nesse programa pode ser perdido. Processos essenciais do sistema são protegidos e não podem ser encerrados.</div>
-        <Field label="Confirme sua senha de administrador">
-          <input class="input" type="password" autocomplete="current-password" required value={password} onInput={(e) => setPassword(e.currentTarget.value)} />
-        </Field>
         <label class="check"><input type="checkbox" checked={confirm} onChange={(e) => setConfirm(e.currentTarget.checked)} /> Sim, quero encerrar este processo.</label>
         <ErrorBox error={error} />
         <div class="row">
-          <Button type="submit" variant="danger" disabled={!confirm || !password || busy}>{busy ? 'Expulsando...' : 'Expulsar'}</Button>
+          <Button type="submit" variant="danger" disabled={!confirm || busy}>{busy ? 'Expulsando...' : 'Expulsar'}</Button>
           <Button variant="light" onClick={onClose}>Cancelar</Button>
         </div>
       </form>
@@ -56,7 +52,6 @@ function KickDialog({ proc, machine, onClose, onDone }) {
 
 export function ProcessesPage() {
   const payload = useStore(() => selectedMachine());
-  const isAdmin = useStore((s) => s.auth.user?.role === 'admin');
   const machine = payload?.machine;
   const [opts, setOpts] = useState({ sort: 'cpu', order: 'desc', limit: 25, q: '', filter: 'all' });
   const [query, setQuery] = useState('');
@@ -143,7 +138,7 @@ export function ProcessesPage() {
                 <th><button onClick={() => sortBy('mem')}>Memória{arrow('mem')}</button></th>
                 <th>Tempo</th>
                 <th>Estado</th>
-                {isAdmin && <th>Ação</th>}
+                <th>Ação</th>
               </tr>
             </thead>
             <tbody>
@@ -156,12 +151,10 @@ export function ProcessesPage() {
                   <td class="num">{p.mem != null ? `${p.mem.toFixed(1)}%` : '—'}{p.memRss ? ` · ${formatBytes(p.memRss)}` : ''}</td>
                   <td class="num">{p.runtimeSec != null ? formatDuration(p.runtimeSec) : '—'}</td>
                   <td>{p.state || '—'}</td>
-                  {isAdmin && (
-                    <td>
-                      <Button small variant="danger" disabled={p.protected || !data.canKill} title={p.protected ? p.protectedReason : !data.canKill ? 'Encerramento desativado neste servidor' : 'Encerrar processo'}
-                        onClick={() => setKick(p)}>Expulsar</Button>
-                    </td>
-                  )}
+                  <td>
+                    <Button small variant="danger" disabled={p.protected || !data.canKill} title={p.protected ? p.protectedReason : !data.canKill ? 'Encerramento desativado neste servidor' : 'Encerrar processo'}
+                      onClick={() => setKick(p)}>Expulsar</Button>
+                  </td>
                 </tr>
               ))}
             </tbody>

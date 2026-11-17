@@ -2,8 +2,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { validate } from '../middleware/validate.js';
-import { requireAdmin } from '../middleware/auth.js';
-import { SETTINGS_SCHEMAS, secretsSchema } from '../schemas.js';
+import { SETTINGS_SCHEMAS, secretsSchema, prefsPatchSchema } from '../schemas.js';
 
 const listQuery = z.object({
   limit: z.coerce.number().int().min(1).max(200).default(50),
@@ -34,19 +33,19 @@ export function notificationRoutes({ machines, achievements, notifications, sett
     res.json({ ok: true });
   });
 
-  r.delete('/notifications', requireAdmin, async (req, res) => {
+  r.delete('/notifications', async (req, res) => {
     await notifications.clear();
-    await audit.log({ user: req.user, action: 'notifications.clear', ip: req.ip });
+    await audit.log({ action: 'notifications.clear', ip: req.ip });
     res.json({ ok: true });
   });
 
-  r.post('/notifications/test/:channel', requireAdmin, async (req, res) => {
+  r.post('/notifications/test/:channel', async (req, res) => {
     try {
-      await notifications.test(req.params.channel, { user: req.user });
-      await audit.log({ user: req.user, action: 'notifications.test', target: req.params.channel, ip: req.ip });
+      await notifications.test(req.params.channel, {});
+      await audit.log({ action: 'notifications.test', target: req.params.channel, ip: req.ip });
       res.json({ ok: true });
     } catch (err) {
-      await audit.log({ user: req.user, action: 'notifications.test', target: req.params.channel, details: { error: err.message }, ip: req.ip, success: false });
+      await audit.log({ action: 'notifications.test', target: req.params.channel, details: { error: err.message }, ip: req.ip, success: false });
       res.status(err.status || 502).json({ error: `Falha no envio: ${err.message}` });
     }
   });
@@ -54,11 +53,10 @@ export function notificationRoutes({ machines, achievements, notifications, sett
   // ---------- configurações ----------
   r.get('/settings', (req, res) => {
     const all = settings.all();
-    const isAdmin = req.user?.role === 'admin';
-    res.json({ settings: all, secrets: isAdmin ? settings.secretStatus() : undefined });
+    res.json({ settings: all, secrets: settings.secretStatus() });
   });
 
-  r.put('/settings/:section', requireAdmin, async (req, res) => {
+  r.put('/settings/:section', async (req, res) => {
     const schema = SETTINGS_SCHEMAS[req.params.section];
     if (!schema) return res.status(404).json({ error: 'Seção de configuração desconhecida.' });
     const parsed = schema.safeParse(req.body);
@@ -66,26 +64,32 @@ export function notificationRoutes({ machines, achievements, notifications, sett
       return res.status(400).json({ error: 'Configuração inválida.', issues: parsed.error.issues.slice(0, 8).map((i) => `${i.path.join('.') || req.params.section}: ${i.message}`) });
     }
     const value = await settings.set(req.params.section, parsed.data);
-    await audit.log({ user: req.user, action: 'settings.update', target: req.params.section, ip: req.ip });
+    await audit.log({ action: 'settings.update', target: req.params.section, ip: req.ip });
     res.json({ section: req.params.section, value });
   });
 
-  r.delete('/settings/:section', requireAdmin, async (req, res) => {
+  r.delete('/settings/:section', async (req, res) => {
     if (!SETTINGS_SCHEMAS[req.params.section]) return res.status(404).json({ error: 'Seção de configuração desconhecida.' });
     const value = await settings.reset(req.params.section);
-    await audit.log({ user: req.user, action: 'settings.reset', target: req.params.section, ip: req.ip });
+    await audit.log({ action: 'settings.reset', target: req.params.section, ip: req.ip });
     res.json({ section: req.params.section, value });
+  });
+
+  /** Preferências visuais: atualização parcial (não precisa enviar tudo). */
+  r.put('/preferences', validate(prefsPatchSchema), async (req, res) => {
+    const value = await settings.set('preferences', { ...settings.get('preferences'), ...req.body });
+    res.json({ preferences: value });
   });
 
   /** Segredos: só escrita. Valor vazio/null apaga. Nunca retornamos o conteúdo. */
-  r.put('/secrets', requireAdmin, validate(secretsSchema), async (req, res) => {
+  r.put('/secrets', validate(secretsSchema), async (req, res) => {
     const changed = [];
     for (const [k, v] of Object.entries(req.body)) {
       if (v === undefined) continue;
       await settings.setSecret(k, v);
       changed.push(k);
     }
-    await audit.log({ user: req.user, action: 'secrets.update', target: changed.join(','), ip: req.ip });
+    await audit.log({ action: 'secrets.update', target: changed.join(','), ip: req.ip });
     res.json({ secrets: settings.secretStatus() });
   });
 
@@ -99,7 +103,7 @@ export function auditRoutes({ audit }) {
     offset: z.coerce.number().int().min(0).default(0),
     action: z.string().max(64).optional(),
   });
-  r.get('/audit', requireAdmin, validate(q, 'query'), async (req, res) => {
+  r.get('/audit', validate(q, 'query'), async (req, res) => {
     res.json({ entries: await audit.list(req.validQuery) });
   });
   return r;

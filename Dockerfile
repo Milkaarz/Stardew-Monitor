@@ -19,7 +19,9 @@ RUN npm run build
 
 # ---------- imagem final ----------
 FROM node:24-alpine AS runtime
+# HOST=0.0.0.0 é necessário DENTRO do contêiner; o docker-compose publica a porta só em 127.0.0.1
 ENV NODE_ENV=production \
+    HOST=0.0.0.0 \
     PORT=3001 \
     DATA_DIR=/app/data
 # procps: "ps" completo (lista de processos do systeminformation)

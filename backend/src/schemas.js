@@ -52,25 +52,7 @@ export const agentPayloadSchema = z.object({
   commandResults: z.array(z.object({ id: z.number().int(), ok: z.boolean(), error: str(500) })).max(50).optional(),
 });
 
-// ---------- autenticação e usuários ----------
-
-export const loginSchema = z.object({
-  username: z.string().trim().min(1).max(64),
-  password: z.string().min(1).max(200),
-});
-
-export const usernameSchema = z.string().trim().regex(/^[a-zA-Z0-9_.-]{3,32}$/, 'use 3 a 32 letras, números, ponto, hífen ou sublinhado');
-
-export const createUserSchema = z.object({
-  username: usernameSchema,
-  password: z.string().min(1).max(200),
-  role: z.enum(['admin', 'viewer']).default('viewer'),
-});
-
-export const changePasswordSchema = z.object({
-  currentPassword: z.string().min(1).max(200),
-  newPassword: z.string().min(1).max(200),
-});
+// ---------- preferências visuais ----------
 
 export const prefsSchema = z.object({
   sound: z.boolean().optional(),
@@ -80,6 +62,9 @@ export const prefsSchema = z.object({
   selectedMachine: z.union([z.number().int(), z.string().max(64)]).nullable().optional(),
   reducedMotion: z.boolean().optional(),
 });
+
+/** PUT /api/preferences: mescla o que vier com as preferências atuais. */
+export const prefsPatchSchema = prefsSchema;
 
 // ---------- máquinas ----------
 
@@ -137,7 +122,6 @@ export const killSchema = z.object({
   machine: z.union([z.number().int(), z.string().max(64)]).optional(),
   pid: z.number().int().positive(),
   name: z.string().min(1).max(256),
-  password: z.string().min(1).max(200),
   confirm: z.literal(true),
 });
 

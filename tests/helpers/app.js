@@ -8,8 +8,6 @@ import { signBody } from '@stardew-monitor/agent/client';
 import { snapshot } from './fixtures.js';
 
 export const silent = { debug() {}, info() {}, warn() {}, error() {} };
-export const ADMIN = { username: 'admin', password: 'senha-admin-123' };
-export const VIEWER = { username: 'visitante', password: 'senha-visit-123' };
 
 export function fakeCollector(list = []) {
   return {
@@ -48,7 +46,7 @@ export async function makeApp({ config: cfg = {}, collector = fakeCollector(), d
     appSecret: 'segredo-de-teste-com-mais-de-32-caracteres',
     staticDir: '/nao/existe',
     ...cfg,
-    rateLimit: { apiPerMin: 10000, loginPer15Min: 100, agentPerMin: 10000, killPerMin: 100, ...(cfg.rateLimit || {}) },
+    rateLimit: { apiPerMin: 10000, agentPerMin: 10000, killPerMin: 100, ...(cfg.rateLimit || {}) },
   };
   const db = await openDatabase({ url: dbUrl || 'sqlite::memory:', logger: silent });
   const sent = [];
@@ -56,8 +54,6 @@ export async function makeApp({ config: cfg = {}, collector = fakeCollector(), d
     discord: { label: 'Discord', configured: () => true, send: async (n) => sent.push(n) },
   };
   const ctx = await createServices({ config, db, logger: silent, collector, channels });
-  await ctx.auth.createUser({ ...ADMIN, role: 'admin' });
-  await ctx.auth.createUser({ ...VIEWER, role: 'viewer' });
   const local = await ctx.machines.ensureLocal({ hostname: 'servidor-teste', farmName: 'Fazenda Principal' });
   const app = createApp(ctx);
   return {
@@ -69,13 +65,11 @@ export async function makeApp({ config: cfg = {}, collector = fakeCollector(), d
   };
 }
 
-/** Faz login e devolve um "agente" supertest com cookie + helper que já envia o CSRF. */
-export async function login(app, who = ADMIN) {
-  const agent = request.agent(app);
-  const res = await agent.post('/api/auth/login').send(who).expect(200);
-  const csrf = res.body.csrf;
-  const withCsrf = (method) => (url) => agent[method](url).set('X-CSRF-Token', csrf);
-  return { agent, csrf, post: withCsrf('post'), put: withCsrf('put'), patch: withCsrf('patch'), del: withCsrf('delete'), get: (url) => agent.get(url) };
+/** Cliente do painel: envia o cabeçalho X-Stardew-Monitor nas alterações, como a interface faz. */
+export function client(app) {
+  const agent = request(app);
+  const withHeader = (method) => (url) => agent[method](url).set('X-Stardew-Monitor', '1');
+  return { agent, post: withHeader('post'), put: withHeader('put'), patch: withHeader('patch'), del: withHeader('delete'), get: (url) => agent.get(url) };
 }
 
 /** Envia leituras como um agente de verdade (Bearer + HMAC). */

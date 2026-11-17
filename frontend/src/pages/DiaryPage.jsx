@@ -12,7 +12,6 @@ const catOf = (k) => NOTE_CATEGORIES.find((c) => c.key === k) || NOTE_CATEGORIES
 const blank = (machineId) => ({ id: null, title: '', body: '', category: 'maintenance', machineId: machineId ?? null });
 
 export function DiaryPage() {
-  const isAdmin = useStore((s) => s.auth.user?.role === 'admin');
   const machines = useStore((s) => s.machines);
   const current = useStore(() => selectedMachine());
   const [filters, setFilters] = useState({ q: '', category: '', onlyThis: false });
@@ -57,7 +56,6 @@ export function DiaryPage() {
 
   /** Autosave: espera 1 s sem digitar; salvamentos ficam em fila (sem duplicar notas novas). */
   const edit = (patch) => {
-    if (!isAdmin) return;
     const next = { ...draftRef.current, ...patch };
     draftRef.current = next;
     setDraft(next);
@@ -124,7 +122,7 @@ export function DiaryPage() {
           <label class="check" style={{ alignSelf: 'end' }}>
             <input type="checkbox" checked={filters.onlyThis} onChange={(e) => setFilters({ ...filters, onlyThis: e.currentTarget.checked })} /> Só de {current?.machine.farmName || 'esta fazenda'}
           </label>
-          {isAdmin && <div style={{ alignSelf: 'end' }}><Button onClick={() => open(blank(current?.machine.id))}>+ Nova anotação</Button></div>}
+          <div style={{ alignSelf: 'end' }}><Button onClick={() => open(blank(current?.machine.id))}>+ Nova anotação</Button></div>
         </div>
       </Panel>
       <ErrorBox error={error} onRetry={reload} />
@@ -148,30 +146,30 @@ export function DiaryPage() {
           )}
         </div>
         <Panel title={draft ? (draft.id ? '✏️ Anotação' : '✏️ Nova anotação') : '📝 Leitura'}>
-          {!draft ? <Empty>Escolha uma anotação na lista{isAdmin ? ' ou crie uma nova' : ''}.</Empty> : (
+          {!draft ? <Empty>Escolha uma anotação na lista ou crie uma nova.</Empty> : (
             <div class="stack">
               <Field label="Título">
-                <input class="input" maxLength={120} value={draft.title} readOnly={!isAdmin} onInput={(e) => edit({ title: e.currentTarget.value })} placeholder="Troquei a pasta térmica" />
+                <input class="input" maxLength={120} value={draft.title} onInput={(e) => edit({ title: e.currentTarget.value })} placeholder="Troquei a pasta térmica" />
               </Field>
               <div class="form-grid">
                 <Field label="Categoria">
-                  <select class="input" value={draft.category} disabled={!isAdmin} onChange={(e) => edit({ category: e.currentTarget.value })}>
+                  <select class="input" value={draft.category} onChange={(e) => edit({ category: e.currentTarget.value })}>
                     {NOTE_CATEGORIES.map((c) => <option key={c.key} value={c.key}>{c.icon} {c.label}</option>)}
                   </select>
                 </Field>
                 <Field label="Fazenda">
-                  <select class="input" value={draft.machineId ?? ''} disabled={!isAdmin} onChange={(e) => edit({ machineId: e.currentTarget.value ? Number(e.currentTarget.value) : null })}>
+                  <select class="input" value={draft.machineId ?? ''} onChange={(e) => edit({ machineId: e.currentTarget.value ? Number(e.currentTarget.value) : null })}>
                     <option value="">Todas as fazendas</option>
                     {Object.values(machines).map((m) => <option key={m.machine.id} value={m.machine.id}>{m.machine.farmName}</option>)}
                   </select>
                 </Field>
               </div>
               <Field label="Texto">
-                <textarea class="input" rows={12} maxLength={20000} value={draft.body} readOnly={!isAdmin} onInput={(e) => edit({ body: e.currentTarget.value })} placeholder="O que mudou, por quê, e como ficou..." />
+                <textarea class="input" rows={12} maxLength={20000} value={draft.body} onInput={(e) => edit({ body: e.currentTarget.value })} placeholder="O que mudou, por quê, e como ficou..." />
               </Field>
               <div class="row spread">
                 <span class="saved-state" aria-live="polite">{saveState || (draft.id ? `Criada em ${fmtDateTime(draft.createdAt)}${draft.updatedAt !== draft.createdAt ? ` · editada em ${fmtDateTime(draft.updatedAt)}` : ''}` : '')}</span>
-                {isAdmin && draft.id && <Button small variant="danger" onClick={() => setConfirmDel(draft)}>Apagar</Button>}
+                {draft.id && <Button small variant="danger" onClick={() => setConfirmDel(draft)}>Apagar</Button>}
               </div>
             </div>
           )}

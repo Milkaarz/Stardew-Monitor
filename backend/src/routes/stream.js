@@ -1,20 +1,17 @@
 /**
  * Tempo real via Server-Sent Events (GET /api/stream).
- * Simples, atravessa proxies HTTP comuns e usa o mesmo cookie de sessão.
  */
 import { Router } from 'express';
 
-const MAX_STREAMS_PER_USER = 12;
+const MAX_STREAMS = 20;
 
 export function streamRoutes({ bus, machines, achievements }) {
   const r = Router();
-  const perUser = new Map();
+  let open = 0;
 
   r.get('/stream', (req, res) => {
-    const uid = req.user.id;
-    const count = perUser.get(uid) || 0;
-    if (count >= MAX_STREAMS_PER_USER) return res.status(429).json({ error: 'Abas demais abertas.' });
-    perUser.set(uid, count + 1);
+    if (open >= MAX_STREAMS) return res.status(429).json({ error: 'Abas demais abertas.' });
+    open++;
 
     res.writeHead(200, {
       'Content-Type': 'text/event-stream; charset=utf-8',
@@ -31,13 +28,12 @@ export function streamRoutes({ bus, machines, achievements }) {
       at: Date.now(),
     });
 
-    const isAdmin = req.user.role === 'admin';
     const handlers = {
       metrics: (p) => send('metrics', p),
       machine: (p) => send('machine', p),
       notification: (p) => send('notification', p),
       achievement: (p) => send('achievement', p),
-      command: (p) => (isAdmin ? send('command', p) : null),
+      command: (p) => send('command', p),
       settings: (p) => send('settings', p),
     };
     for (const [ev, fn] of Object.entries(handlers)) bus.on(ev, fn);
@@ -46,7 +42,7 @@ export function streamRoutes({ bus, machines, achievements }) {
     req.on('close', () => {
       clearInterval(ping);
       for (const [ev, fn] of Object.entries(handlers)) bus.off(ev, fn);
-      perUser.set(uid, Math.max(0, (perUser.get(uid) || 1) - 1));
+      open = Math.max(0, open - 1);
     });
   });
 

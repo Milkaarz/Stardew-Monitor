@@ -1,4 +1,6 @@
-# Instalação e configuração
+# Instalação e configuração (código-fonte)
+
+> Só quer usar? Baixe o [aplicativo](aplicativo.md): não precisa instalar nada. Esta página é para rodar pelo código-fonte.
 
 ## Requisitos
 
@@ -12,17 +14,16 @@
 ```bash
 npm install          # instala todos os módulos (workspaces)
 npm run build        # compila a interface em frontend/dist
-npm start            # sobe API + painel em http://localhost:3001
+npm start            # sobe o painel em http://localhost:3001 (só neste computador)
 ```
 
 Na primeira execução:
 
 1. as migrations criam as tabelas (`data/stardew.db`);
 2. um segredo é gerado em `data/.app-secret` (se `APP_SECRET` não estiver definido);
-3. o usuário `admin` é criado com `ADMIN_PASSWORD` ou com uma senha aleatória **mostrada uma vez no log**;
-4. o monitor local começa a coletar a cada 5 s.
+3. o monitor local começa a coletar a cada 5 s.
 
-Esqueceu a senha? `npm run create-admin -- admin nova-senha-forte` redefine (ou cria) o administrador.
+Não há login: o painel só responde no próprio computador (veja [seguranca.md](seguranca.md)).
 
 ## Configuração (.env)
 
@@ -31,36 +32,33 @@ Copie `.env.example` para `.env`. As principais variáveis:
 | Variável | Padrão | Para quê |
 |---|---|---|
 | `PORT` | `3001` | Porta HTTP |
+| `HOST` | `127.0.0.1` | Interface de rede (use `0.0.0.0` só para receber agentes de outras máquinas) |
+| `ALLOWED_HOSTS` | — | Nomes extras aceitos no endereço do painel |
 | `DATABASE_URL` | `sqlite:./data/stardew.db` | `sqlite:arquivo.db` ou `postgres://...` |
 | `APP_SECRET` | gerado | Criptografa credenciais salvas pelo painel (≥ 32 caracteres) |
-| `ADMIN_USERNAME` / `ADMIN_PASSWORD` | `admin` / gerada | Primeiro administrador |
 | `LOCAL_MONITOR` | `true` | Monitorar a máquina do servidor |
 | `LOCAL_INTERVAL` | `5` | Segundos entre leituras locais |
-| `ALLOW_PROCESS_KILL` | `true` | Permitir "Expulsar morador" na máquina local |
+| `ALLOW_PROCESS_KILL` | `true` | Permitir "Expulsar morador" (só a partir deste computador) |
 | `PROTECTED_PROCESSES` | — | Nomes extras protegidos (vírgula) |
-| `PUBLIC_DASHBOARD` | `false` | Resumo público sem dados sensíveis |
-| `TRUST_PROXY` | `1` em produção | Atrás de proxy reverso |
-| `COOKIE_SECURE` | `auto` | Cookie só via HTTPS |
 | `DISCORD_WEBHOOK_URL`, `TELEGRAM_*`, `SMTP_*` | — | Canais de notificação (têm prioridade sobre o painel) |
 
 A lista completa e comentada está no [.env.example](../.env.example).
 
 ## Configurações pelo painel
 
-Em **Ajustes** (administradores):
+Em **Ajustes**:
 
 - **Estações**: calendário real (hemisfério sul ou norte) ou próprio (28 dias por estação); decorações de festival.
 - **Clima**: limites de carga e temperatura para nublado, chuva, tempestade, calor e vento.
 - **Conquistas**: parâmetros de Dia Tranquilo, Máquina Incansável e Fazenda Organizada.
 - **Festivais**: ativar/desativar e mudar as datas (por estação, data fixa ou relativa à Páscoa).
 - **Retenção**: quanto tempo guardar leituras, médias, avisos e auditoria.
-- **Usuários** e **Auditoria**.
+- **Preferências** (tema da interface, sons, música, animações reduzidas) e **Auditoria**.
 
 Em **Avisos**: limites de alerta por categoria, intervalo entre alertas e canais (Discord, Telegram, e-mail) com botão de teste.
 
 Em **Pelican Town > Gerenciar**: nome e tema de cada fazenda, troca de token e remoção.
 
-Preferências pessoais (tema da interface, sons, música, animações reduzidas) ficam salvas na conta.
 
 ## Sensores por sistema
 

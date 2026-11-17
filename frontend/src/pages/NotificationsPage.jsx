@@ -15,7 +15,6 @@ const CAT_LABEL = { cpu: '⚡ CPU', ram: '🌱 RAM', disk: '🏚️ Disco', temp
 const KIND_LABEL = { alert: 'Alerta', recovery: 'Normalizado', achievement: 'Conquista', system: 'Sistema' };
 
 function History() {
-  const isAdmin = useStore((s) => s.auth.user?.role === 'admin');
   const machines = useStore((s) => s.machines);
   const [filter, setFilter] = useState({ kind: '', category: '' });
   const [limit, setLimit] = useState(30);
@@ -51,7 +50,7 @@ function History() {
             {ALERT_CATEGORIES.map((c) => <option key={c} value={c}>{CAT_LABEL[c]}</option>)}
           </select>
         </Field>
-        {isAdmin && <div style={{ alignSelf: 'end' }}><Button small variant="light" onClick={() => setConfirmClear(true)}>Limpar histórico</Button></div>}
+        <div style={{ alignSelf: 'end' }}><Button small variant="light" onClick={() => setConfirmClear(true)}>Limpar histórico</Button></div>
       </div>
       <ErrorBox error={error} onRetry={reload} />
       {loading && !data ? <Loading /> : !data?.items.length ? <Empty>Nenhum aviso. A fazenda está em paz. 🐔</Empty> : (
@@ -155,7 +154,7 @@ const CHANNEL_LABEL = { discord: '💬 Discord (webhook)', telegram: '✈️ Tel
 function Channels() {
   const n = useSettingsSection('notifications');
   const secrets = useStore((s) => s.secrets);
-  const prefs = useStore((s) => s.auth.user?.prefs || {});
+  const prefs = useStore((s) => s.prefs);
   const [values, setValues] = useState({});
   const [busy, setBusy] = useState(null);
   if (!n.draft || !secrets) return <Loading />;
@@ -252,23 +251,20 @@ function Channels() {
 }
 
 export function NotificationsPage() {
-  const isAdmin = useStore((s) => s.auth.user?.role === 'admin');
   const [tab, setTab] = useState('history');
   useEffect(() => {
     if (!state.settings) api.get('/settings').then((r) => setState({ settings: r.settings, secrets: r.secrets || null })).catch(() => {});
   }, []);
   return (
     <div class="stack">
-      {isAdmin && (
-        <div class="tabs" role="tablist">
-          {[['history', '🔔 Histórico'], ['thresholds', '📏 Limites'], ['channels', '📨 Canais']].map(([k, l]) => (
-            <Button key={k} small variant={tab === k ? 'on' : ''} role="tab" aria-selected={tab === k} onClick={() => setTab(k)}>{l}</Button>
-          ))}
-        </div>
-      )}
+      <div class="tabs" role="tablist">
+        {[['history', '🔔 Histórico'], ['thresholds', '📏 Limites'], ['channels', '📨 Canais']].map(([k, l]) => (
+          <Button key={k} small variant={tab === k ? 'on' : ''} role="tab" aria-selected={tab === k} onClick={() => setTab(k)}>{l}</Button>
+        ))}
+      </div>
       {tab === 'history' && <History />}
-      {isAdmin && tab === 'thresholds' && <Thresholds />}
-      {isAdmin && tab === 'channels' && <Channels />}
+      {tab === 'thresholds' && <Thresholds />}
+      {tab === 'channels' && <Channels />}
     </div>
   );
 }

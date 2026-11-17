@@ -94,7 +94,6 @@ export function connectLive() {
 
   es.onerror = () => {
     failures++;
-    if (state.auth.status !== 'authenticated') return disconnectLive();
     if (failures >= 3) startPolling();
     else setState({ connection: 'connecting' });
   };

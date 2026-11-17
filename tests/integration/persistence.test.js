@@ -7,7 +7,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { openDatabase, migrate } from '@stardew-monitor/database';
 import { toPgPlaceholders } from '../../database/src/postgres.js';
-import { makeApp, login, silent } from '../helpers/app.js';
+import { makeApp, client, silent } from '../helpers/app.js';
 import { snapshot } from '../helpers/fixtures.js';
 
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'stardew-db-'));
@@ -78,7 +78,7 @@ test('agregação por minuto e hora com média ponderada e retenção', async ()
 });
 
 test('configurações, conquistas, anotações e máquinas sobrevivem a um reinício', async () => {
-  const s = await login(t.app);
+  const s = client(t.app);
   await s.post('/api/notes').send({ title: 'Persistida', body: 'texto', category: 'personal' }).expect(201);
   const created = await s.post('/api/machines').send({ name: 'Persistente', farmName: 'Fazenda Persistente', theme: 'mines' }).expect(201);
   await t.ctx.settings.set('weather', { ...t.ctx.settings.get('weather'), hotTemp: 66 });

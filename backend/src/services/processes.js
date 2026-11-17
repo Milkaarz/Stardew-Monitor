@@ -31,7 +31,7 @@ export class ProcessService {
   /**
    * @param {{ sort?: 'cpu'|'mem'|'name'|'pid', order?: 'asc'|'desc', limit?: number, q?: string, filter?: string }} opts
    */
-  async list(machine, { sort = 'cpu', order = 'desc', limit = 25, q = '', filter = 'all' } = {}, { isAdmin = false } = {}) {
+  async list(machine, { sort = 'cpu', order = 'desc', limit = 25, q = '', filter = 'all' } = {}) {
     const { list, at, platform, live } = await this.rawList(machine);
     const now = Date.now();
     const query = String(q || '').trim().toLowerCase();
@@ -63,22 +63,22 @@ export class ProcessService {
         runtimeSec: p.started ? Math.max(0, Math.round((now - p.started) / 1000)) : null,
         state: p.state || null,
         protected: prot.protected,
-        protectedReason: isAdmin ? prot.reason || null : undefined,
+        protectedReason: prot.reason || null,
       };
     });
-    const canKill = isAdmin && (machine.row.is_local ? this.config.allowProcessKill : true);
+    const canKill = machine.row.is_local ? this.config.allowProcessKill : true;
     return { machineId: machine.row.id, total, at, live, items, canKill, platform };
   }
 
-  async kill(machine, { pid, name }, { user, ip }) {
+  async kill(machine, { pid, name }, { ip }) {
     const target = `${machine.row.farm_name}:${pid}`;
     if (machine.row.is_local) {
       if (!this.config.allowProcessKill) {
-        await this.audit.log({ user, action: 'process.kill', target, details: { name, reason: 'desativado' }, ip, success: false });
+        await this.audit.log({ action: 'process.kill', target, details: { name, reason: 'desativado' }, ip, success: false });
         throw Object.assign(new Error('Encerrar processos está desativado neste servidor (ALLOW_PROCESS_KILL=false).'), { status: 403 });
       }
       const r = await killProcess({ pid, name, collector: this.collector, extraProtected: this.config.protectedProcesses });
-      await this.audit.log({ user, action: 'process.kill', target, details: { name, code: r.code || null, error: r.error || null }, ip, success: r.ok });
+      await this.audit.log({ action: 'process.kill', target, details: { name, code: r.code || null, error: r.error || null }, ip, success: r.ok });
       if (!r.ok) {
         const status = { protected: 403, permission: 403, not_found: 404, mismatch: 409, invalid: 400 }[r.code] || 500;
         throw Object.assign(new Error(r.error), { status });
@@ -90,11 +90,11 @@ export class ProcessService {
     const known = (machine.live.processes || []).find((p) => p.pid === Number(pid));
     const prot = protectionReason(known || { pid, name }, { platform: machine.row.info?.platform || 'linux', extra: this.config.protectedProcesses });
     if (prot.protected) {
-      await this.audit.log({ user, action: 'process.kill.remote', target, details: { name, reason: prot.reason }, ip, success: false });
+      await this.audit.log({ action: 'process.kill.remote', target, details: { name, reason: prot.reason }, ip, success: false });
       throw Object.assign(new Error(`Morador protegido: ${prot.reason}`), { status: 403 });
     }
-    const cmd = await this.commands.enqueue(machine.row.id, 'kill', { pid: Number(pid), name }, user);
-    await this.audit.log({ user, action: 'process.kill.remote', target, details: { name, commandId: cmd.id }, ip, success: true });
+    const cmd = await this.commands.enqueue(machine.row.id, 'kill', { pid: Number(pid), name });
+    await this.audit.log({ action: 'process.kill.remote', target, details: { name, commandId: cmd.id }, ip, success: true });
     return { ok: true, mode: 'remote', commandId: cmd.id, message: 'Ordem enviada ao agente. Ela será executada no próximo envio, se o agente permitir.' };
   }
 }

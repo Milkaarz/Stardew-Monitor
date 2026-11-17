@@ -1,36 +1,16 @@
 /**
- * Rotas sem login:
+ * Rotas utilitárias:
  *  - /api/health: verificação de saúde (Docker, Render, uptime robots);
- *  - /api/public/town: resumo SEM dados sensíveis (só se PUBLIC_DASHBOARD=true);
  *  - /api/dados: formato do painel v2 (compatibilidade com o agente PHP antigo).
  */
 import os from 'node:os';
 import { Router } from 'express';
-import { safeEqual } from '../lib/crypto.js';
 
-export function publicRoutes({ machines, config }) {
+export function publicRoutes() {
   const r = Router();
 
-  r.get('/health', (_req, res) => res.json({ ok: true, uptimeSec: Math.round(process.uptime()) }));
-
-  r.get('/public/town', (_req, res) => {
-    if (!config.publicDashboard) return res.status(404).json({ error: 'Painel público desativado.' });
-    // nada de hostname, IP, processos, usuários ou modelo de hardware
-    res.json({
-      farms: machines.list().map((m) => {
-        const p = machines.toPublic(m);
-        return {
-          uid: p.uid,
-          farmName: p.farmName,
-          theme: p.theme,
-          status: p.status,
-          cpu: p.summary?.cpu ?? null,
-          ram: p.summary?.ram ?? null,
-          disk: p.summary?.disk ?? null,
-        };
-      }),
-    });
-  });
+  // "app" permite ao aplicativo reconhecer uma instância já aberta e só abrir o navegador
+  r.get('/health', (_req, res) => res.json({ ok: true, app: 'stardew-monitor', uptimeSec: Math.round(process.uptime()) }));
 
   return r;
 }
@@ -76,15 +56,6 @@ export function legacyPayload(m, { port }) {
 export function legacyRoutes({ machines, config }) {
   const r = Router();
   r.get('/dados', (req, res) => {
-    // aceita a sessão do painel OU o token legado (Basic com qualquer usuário, ou cabeçalho X-Token)
-    let ok = !!req.user;
-    if (!ok && config.legacyApiToken) {
-      const basic = (req.get('authorization') || '').startsWith('Basic ')
-        ? Buffer.from(req.get('authorization').slice(6), 'base64').toString().split(':').slice(1).join(':')
-        : '';
-      ok = safeEqual(basic, config.legacyApiToken) || safeEqual(req.get('x-token') || '', config.legacyApiToken);
-    }
-    if (!ok) return res.status(401).json({ error: 'Faça login ou use LEGACY_API_TOKEN.' });
     const payload = legacyPayload(machines.local(), { port: config.port });
     if (!payload) return res.status(503).json({ error: 'Monitor local sem dados ainda.' });
     res.set('Cache-Control', 'no-store');

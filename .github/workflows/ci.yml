@@ -3,6 +3,7 @@ name: CI
 on:
   push:
     branches: [main]
+    tags: ["v*"]
   pull_request:
 
 permissions:
@@ -77,3 +78,51 @@ jobs:
         run: docker build -t stardew-monitor:ci .
       - name: Agente
         run: docker build -f agent/Dockerfile -t stardew-agent:ci .
+
+  app:
+    name: Aplicativo baixável (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    needs: test
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Gerar o executável
+        run: npm run app:build
+      - name: Testar o executável (sobe, responde e encerra)
+        shell: bash
+        run: |
+          EXE=$(ls release/StardewMonitor-*)
+          PORT=3555 "$EXE" --no-browser --data "$RUNNER_TEMP/dados" &
+          for i in $(seq 1 40); do curl -sf http://localhost:3555/api/health && break; sleep 1; done
+          curl -sf http://localhost:3555/api/health | grep -q stardew-monitor
+          curl -sf http://localhost:3555/ | grep -q "<!doctype html>"
+          kill %1 || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: StardewMonitor-${{ runner.os }}
+          path: release/StardewMonitor-*
+          if-no-files-found: error
+
+  release:
+    name: Publicar versão (tags v*)
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: app
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: release
+          merge-multiple: true
+      - name: Criar a Release com os executáveis
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${{ github.ref_name }}" release/* --repo "${{ github.repository }}" --title "Stardew Monitor ${{ github.ref_name }}" --notes "Baixe o arquivo do seu sistema e abra. Windows: StardewMonitor-windows-x64.exe · Linux: StardewMonitor-linux-x64 (chmod +x)."

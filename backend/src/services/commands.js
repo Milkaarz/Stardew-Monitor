@@ -14,11 +14,11 @@ export class CommandService {
     this.audit = audit;
   }
 
-  async enqueue(machineId, type, payload, user) {
+  async enqueue(machineId, type, payload) {
     const now = Date.now();
     const id = await this.db.insert(
       'INSERT INTO agent_commands (machine_id, type, payload, status, created_by, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [machineId, type, JSON.stringify(payload), 'pending', user?.id ?? null, now, now],
+      [machineId, type, JSON.stringify(payload), 'pending', null, now, now],
     );
     return { id, status: 'pending' };
   }
@@ -40,7 +40,6 @@ export class CommandService {
       await this.db.run('UPDATE agent_commands SET status = ?, result = ?, updated_at = ? WHERE id = ?', [status, JSON.stringify({ ok: !!r.ok, error: r.error || null }), Date.now(), row.id]);
       const payload = parseJson(row.payload, {});
       await this.audit.log({
-        user: row.created_by ? { id: row.created_by, username: null } : null,
         action: 'process.kill.remote.result',
         target: `${machine.row.farm_name}:${payload.pid}`,
         details: { name: payload.name, error: r.error || null },

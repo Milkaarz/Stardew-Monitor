@@ -1,4 +1,4 @@
-import { setState, state, useStore, selectedMachine } from '../services/store.js';
+import { setState, useStore, selectedMachine } from '../services/store.js';
 import { savePrefs } from '../services/prefs.js';
 
 const STATUS_ICON = { ok: '🟢', warn: '🟡', crit: '🔴', offline: '⚪' };
@@ -32,5 +32,5 @@ export function MachinePicker() {
 
 export function selectMachine(id) {
   setState({ selectedId: id });
-  if (state.auth.user) savePrefs({ selectedMachine: id });
+  savePrefs({ selectedMachine: id });
 }

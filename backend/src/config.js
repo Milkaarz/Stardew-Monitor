@@ -6,7 +6,10 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
-export const ROOT_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+// No aplicativo empacotado não existe import.meta.url: os caminhos vêm de DATA_DIR/STATIC_DIR.
+export const ROOT_DIR = typeof import.meta?.url === 'string' && import.meta.url.startsWith('file:')
+  ? path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
+  : process.cwd();
 
 const bool = (v, d) => (v == null || v === '' ? d : /^(1|true|yes|sim|on)$/i.test(String(v)));
 const int = (v, d) => (Number.isFinite(Number(v)) && v !== '' && v != null ? Number(v) : d);
@@ -36,28 +39,24 @@ export function loadConfig(env = process.env) {
     nodeEnv,
     isProduction: nodeEnv === 'production',
     port: int(env.PORT, 3001),
-    host: env.HOST || '0.0.0.0',
+    // só este computador acessa o painel (não há login). Para receber agentes de outras máquinas,
+    // use HOST=0.0.0.0 — o painel continua aceitando apenas o próprio computador.
+    host: env.HOST || '127.0.0.1',
+    allowedHosts: list(env.ALLOWED_HOSTS),
     dataDir,
     databaseUrl: env.DATABASE_URL || `sqlite:${path.join(dataDir, 'stardew.db')}`,
     databaseSsl: env.DATABASE_SSL || '',
     appSecret: env.APP_SECRET_RESOLVED || null, // preenchido no boot (resolveAppSecret)
-    sessionTtlHours: int(env.SESSION_TTL_HOURS, 12),
-    cookieSecure: (env.COOKIE_SECURE || 'auto').toLowerCase(), // auto | true | false
-    trustProxy: env.TRUST_PROXY || (nodeEnv === 'production' ? '1' : 'loopback'),
-    adminUsername: env.ADMIN_USERNAME || 'admin',
-    adminPassword: env.ADMIN_PASSWORD || '',
+    trustProxy: env.TRUST_PROXY || 'loopback',
     localMonitor: bool(env.LOCAL_MONITOR, true),
     localIntervalSec: Math.max(2, int(env.LOCAL_INTERVAL, 5)),
     localFarmName: env.LOCAL_FARM_NAME || 'Fazenda Principal',
     allowProcessKill: bool(env.ALLOW_PROCESS_KILL, true),
     protectedProcesses: list(env.PROTECTED_PROCESSES),
-    publicDashboard: bool(env.PUBLIC_DASHBOARD, false),
-    legacyApiToken: env.LEGACY_API_TOKEN || '',
     staticDir: path.resolve(ROOT_DIR, env.STATIC_DIR || 'frontend/dist'),
     windowsHelper: bool(env.WINDOWS_HELPER, true),
     rateLimit: {
       apiPerMin: int(env.RATE_LIMIT_API_PER_MIN, 600),
-      loginPer15Min: int(env.RATE_LIMIT_LOGIN_PER_15MIN, 10),
       agentPerMin: int(env.RATE_LIMIT_AGENT_PER_MIN, 240),
       killPerMin: int(env.RATE_LIMIT_KILL_PER_MIN, 10),
     },

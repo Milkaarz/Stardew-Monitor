@@ -6,7 +6,9 @@ import { useEffect, useState, useRef } from 'preact/hooks';
 const listeners = new Set();
 
 export const state = {
-  auth: { status: 'loading', user: null, csrf: null, features: {} },
+  status: 'loading', // loading | ready | error
+  error: null,
+  prefs: {}, // preferências visuais deste computador
   machines: {}, // id -> { machine, snapshot, derived, receivedAt, farmSeconds }
   selectedId: null,
   connection: 'connecting', // connecting | live | polling | offline

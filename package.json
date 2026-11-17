@@ -19,21 +19,24 @@
     "build": "npm run build --workspace frontend",
     "agent": "node agent/src/index.js",
     "migrate": "node database/src/cli.js",
-    "create-admin": "node backend/src/cli/create-admin.js",
     "lint": "eslint .",
     "test": "node --test --test-concurrency=1 \"tests/**/*.test.js\"",
     "test:pg": "node --test --test-concurrency=1 \"tests/integration/*.test.js\" \"tests/api/*.test.js\"",
     "check": "npm run lint && npm test && npm run build",
     "agente:php": "node --env-file=.env legacy/agente-stardew.cjs",
-    "pm2": "pm2 start ecosystem.config.cjs"
+    "pm2": "pm2 start ecosystem.config.cjs",
+    "app": "node app/main.js",
+    "app:build": "node scripts/build-app.mjs"
   },
   "engines": {
     "node": ">=22.13.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
+    "esbuild": "^0.28.2",
     "eslint": "^9.39.5",
     "globals": "^16.5.0",
+    "postject": "^1.0.0-alpha.6",
     "supertest": "^7.3.2"
   }
 }

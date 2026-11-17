@@ -73,13 +73,13 @@ export class NotificationService {
     await this.db.run('UPDATE notifications SET deliveries = ? WHERE id = ?', [JSON.stringify(deliveries), n.id]);
   }
 
-  async test(channel, { user } = {}) {
+  async test(channel) {
     const ch = this.channels[channel];
     if (!ch) throw Object.assign(new Error('Canal desconhecido.'), { status: 400 });
     if (!ch.configured(this.settings)) throw Object.assign(new Error(`${ch.label}: credenciais não configuradas.`), { status: 400 });
     await ch.send({
       title: 'Teste de notificação',
-      message: `Se você está lendo isto, o canal ${ch.label} da fazenda está funcionando! (enviado por ${user?.username || 'admin'})`,
+      message: `Se você está lendo isto, o canal ${ch.label} da fazenda está funcionando!`,
       level: 'info',
       createdAt: Date.now(),
     }, this.settings);

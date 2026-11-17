@@ -164,7 +164,6 @@ function ManageDialog({ machine, onClose }) {
 
 export function TownPage() {
   const machines = useStore((s) => s.machines);
-  const isAdmin = useStore((s) => s.auth.user?.role === 'admin');
   const now = useNow(15e3);
   const [dialog, setDialog] = useState(null);
   const list = Object.values(machines).sort((a, b) => (b.machine.isLocal ? 1 : 0) - (a.machine.isLocal ? 1 : 0) || a.machine.id - b.machine.id);
@@ -175,7 +174,7 @@ export function TownPage() {
       <Panel title="🏘️ Pelican Town">
         <div class="row spread">
           <p style={{ margin: 0 }}>Cada casinha é uma máquina monitorada. Clique para abrir a fazenda.</p>
-          {isAdmin && <Button onClick={() => setDialog({ type: 'register' })}>+ Registrar fazenda</Button>}
+          <Button onClick={() => setDialog({ type: 'register' })}>+ Registrar fazenda</Button>
         </div>
         <div class="legend">
           {['ok', 'warn', 'crit', 'offline'].map((s) => (
@@ -185,7 +184,7 @@ export function TownPage() {
       </Panel>
 
       <div class="town-map">
-        {!list.length && <Empty>Nenhuma fazenda ainda. {isAdmin ? 'Registre a primeira!' : ''}</Empty>}
+        {!list.length && <Empty>Nenhuma fazenda ainda. Registre a primeira!</Empty>}
         <div class="town-grid">
           {list.map(({ machine: m }) => (
             <div key={m.id} class={`town-house status-${m.status} ${levelClass(m.status)}`}>
@@ -212,7 +211,7 @@ export function TownPage() {
                   <span class="muted" style={{ fontSize: '1rem' }}>Último sinal: {timeAgo(m.lastSeenAt, now.getTime())}</span>
                 )}
               </button>
-              {isAdmin && <Button small variant="light" onClick={() => setDialog({ type: 'manage', machine: m })}>Gerenciar</Button>}
+              <Button small variant="light" onClick={() => setDialog({ type: 'manage', machine: m })}>Gerenciar</Button>
             </div>
           ))}
         </div>
