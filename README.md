@@ -6,7 +6,9 @@ Não é só ilustração: todos os números vêm de leituras reais **do computad
 
 > Projeto de fã, inspirado na estética de jogos de fazenda em pixel art. Toda a arte é original, desenhada em código (SVG); nenhum recurso de jogo é usado.
 
-**📍 Demo da versão 2 (modo agente + hospedagem PHP):** [https://mizzie.nyx.dev.br/stardew/](https://mizzie.nyx.dev.br/stardew/)
+- **🌐 Site:** [tubular-dieffenbachia-164159.netlify.app](https://tubular-dieffenbachia-164159.netlify.app/) — página de entrada: explica como funciona, leva ao download e, se o aplicativo já estiver aberto no seu computador, abre o seu painel.
+- **⬇️ Download:** [Releases do GitHub](https://github.com/Milkaarz/Stardew-Monitor/releases/latest)
+- **📍 Demo da versão 2 (modo agente + hospedagem PHP):** [mizzie.nyx.dev.br/stardew](https://mizzie.nyx.dev.br/stardew/)
 
 ---
 
@@ -29,14 +31,14 @@ Não é só ilustração: todos os números vêm de leituras reais **do computad
 
 ## ⬇️ Baixar e usar (recomendado)
 
-1. Baixe o aplicativo do seu sistema na página **Releases** do GitHub:
+1. Baixe o aplicativo do seu sistema na página [**Releases**](https://github.com/Milkaarz/Stardew-Monitor/releases/latest) do GitHub:
    - Windows: `StardewMonitor-windows-x64.exe`
    - Linux: `StardewMonitor-linux-x64` (depois `chmod +x StardewMonitor-linux-x64`)
 2. Abra o arquivo (dois cliques). Não precisa instalar nada, nem Node.js.
 3. O navegador abre sozinho em **http://localhost:3001** com a fazenda **deste** computador.
 4. Para encerrar, feche a janela do aplicativo.
 
-Os dados (histórico, conquistas, diário, configurações) ficam em `%LOCALAPPDATA%StardewMonitor` no Windows e `~/.local/share/stardew-monitor` no Linux. Abrir o aplicativo de novo, com ele já aberto, só abre o navegador.
+Os dados (histórico, conquistas, diário, configurações) ficam em `%LOCALAPPDATA%\StardewMonitor` no Windows e `~/.local/share/stardew-monitor` no Linux. Abrir o aplicativo de novo, com ele já aberto, só abre o navegador.
 
 > O Windows pode mostrar "O Windows protegeu o computador" na primeira vez, porque o executável não tem assinatura digital paga. Clique em **Mais informações → Executar assim mesmo**. Detalhes em [docs/aplicativo.md](docs/aplicativo.md).
 
@@ -46,6 +48,17 @@ Os dados (histórico, conquistas, diário, configurações) ficam em `%LOCALAPPD
 npm install
 npm run app:build      # cria release/StardewMonitor-<sistema>-<arquitetura>
 ```
+
+O executável sai para o sistema de quem roda o comando (no Windows, o `.exe`).
+
+### Publicar uma versão para download
+
+```bash
+git tag v3.0.0
+git push --tags
+```
+
+O GitHub Actions gera os executáveis de Windows e Linux, testa se cada um abre e responde e cria a Release com os arquivos anexados. O botão "Baixar o aplicativo" do site aponta para a Release mais recente.
 
 ## 🧑‍💻 Rodar pelo código-fonte
 
@@ -63,15 +76,24 @@ npm start              # http://localhost:3001
 
 Um site na internet não consegue ler o hardware de quem o visita, e uma hospedagem (Render, Vercel...) só enxerga o próprio servidor. Por isso o Stardew Monitor é um aplicativo que roda **no computador que você quer monitorar**: ele lê os sensores direto do sistema e mostra o painel no seu navegador, em `localhost`.
 
+### E o site no Netlify?
+
+O site publicado (Netlify) contém só a interface, sem o servidor: ele **não consegue** mostrar os dados de ninguém. Aberto fora do aplicativo, ele vira uma página de entrada com o passo a passo e o botão de download, e verifica se o aplicativo está aberto no seu computador (`localhost:3001` a `3005`) para oferecer "Abrir meu painel". Num site HTTPS, o navegador pode pedir permissão para acessar a rede local antes dessa verificação.
+
+Para atualizar o site, basta enviar as mudanças ao GitHub (o Netlify publica de novo).
+
+### Outras máquinas
+
 Quer acompanhar outras máquinas da sua casa/rede no mesmo painel? Rode o **agente** nelas (veja [docs/agente.md](docs/agente.md)).
 
 ## 📁 Estrutura
 
 ```
 app/        aplicativo baixável (abre o servidor local e o navegador)
+scripts/    geração do executável (build-app.mjs)
 backend/    API Express, SSE em tempo real, alertas, conquistas, histórico, proteção local
 agent/      agente leve + coletor de métricas multiplataforma (usado também pelo backend)
-frontend/   interface Preact + Vite: fazenda em SVG, páginas, gráficos, sons
+frontend/   interface Preact + Vite: fazenda em SVG, páginas, gráficos, sons, página de entrada do site
 database/   adaptadores SQLite/PostgreSQL e migrations
 shared/     regras puras: métricas -> fazenda, estações, festivais, alertas, conquistas, mensagens
 tests/      testes unitários, de API e de persistência (node:test)
@@ -110,6 +132,7 @@ O GitHub Actions roda tudo isso em Linux e Windows, mais a suíte no PostgreSQL,
 - **Uso da GPU**: NVIDIA via `nvidia-smi` (Windows/Linux) e AMD/Intel via `/sys` no Linux. Outras placas mostram nome e VRAM, sem uso.
 - **Usuário dono do processo** não é informado no Windows sem privilégios de administrador.
 - Dentro de contêineres, o monitor local enxerga o contêiner; prefira o aplicativo.
+- O site (Netlify) não mostra dados: o painel só funciona aberto pelo aplicativo, em `localhost`.
 - O aplicativo não tem assinatura digital: o Windows SmartScreen e alguns antivírus podem pedir confirmação na primeira execução.
 
 ## 👤 Autor
