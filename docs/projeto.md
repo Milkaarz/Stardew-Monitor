@@ -2,63 +2,43 @@
 
 ## 1. Identificação
 
-**Nome:** Stardew Monitor  
-**Categoria:** aplicação web de monitoramento de recursos do sistema  
+**Nome:** Stardew Monitor (versão 3)
+**Categoria:** monitor de hardware e recursos do sistema, com visualização gamificada
 **Repositório:** https://github.com/Milkaarz/Stardew-Monitor
 
 ## 2. Objetivo
 
-Apresentar informações técnicas do ambiente em que o servidor está executando por meio de um painel web com identidade visual inspirada em Stardew Valley. A interface representa métricas e recursos do computador com elementos temáticos, tornando a leitura mais intuitiva.
+Monitorar uma ou várias máquinas com dados reais, coletados continuamente, e apresentá-los como uma fazenda interativa em pixel art — sem abrir mão dos indicadores numéricos, do histórico e dos alertas de um monitor de sistema tradicional.
 
-## 3. Escopo funcional
+## 3. Requisitos funcionais
 
-O projeto contempla:
+| ID | Requisito | Onde |
+|---|---|---|
+| RF01 | Coletar CPU (total, núcleos, threads, temperatura), RAM e swap, discos, E/S de disco, rede, GPU, ventoinhas, bateria, uptime e processos, tratando sensores indisponíveis | `agent/src/collector` |
+| RF02 | Representar cada recurso como elemento da fazenda (casa, plantação, celeiro/silos, carroça/correio, moinho, clima, estamina, dias) | `shared/src/farm.js`, `frontend/src/farm` |
+| RF03 | Estações (calendário real ou próprio), ciclo dia/noite e clima reativo com limites configuráveis | `shared/src/seasons.js`, `farm.js` |
+| RF04 | Animais como indicadores de saúde, sem substituir os números | `frontend/src/farm/Animals.jsx` |
+| RF05 | Conquistas persistentes com progresso, histórico e data | `backend/src/services/achievements.js` |
+| RF06 | Festivais automáticos por data configurável, com decorações | `shared/src/seasons.js`, `Weather.jsx` |
+| RF07 | Alertas configuráveis por categoria, sem repetição, com intervalo mínimo, histórico e envio por Discord, Telegram e e-mail | `shared/src/alerts.js`, `backend/src/services/alerts.js`, `notifier/` |
+| RF08 | Cartão de status com mensagens contextuais e sem repetição excessiva | `shared/src/messages.js` |
+| RF09 | Página de processos com ordenação, filtros, pesquisa e quantidade; encerramento autenticado, confirmado, protegido e auditado | `ProcessesPage.jsx`, `services/processes.js` |
+| RF10 | Diário persistente com categorias, pesquisa, histórico por data e salvamento automático | `DiaryPage.jsx`, `routes/journal.js` |
+| RF11 | Temas: Padrão, Floresta, Praia, Colina, Gengibre e Minas | `farm/palette.js`, `styles/base.css` |
+| RF12 | Várias máquinas com agente, tokens individuais e mapa Pelican Town (verde/amarelo/vermelho/cinza) | `agent/`, `TownPage.jsx` |
+| RF13 | Histórico com períodos de 15 min a 30 dias e agregação | `services/history.js`, `HistoryPage.jsx` |
+| RF14 | Quadro de Missões (tarefas, inclusive diárias) — herdado da v2 | `QuestsPage.jsx` |
+| RF15 | Compatibilidade com a v2 (`/api/dados` e hospedagem PHP) | `routes/public.js`, `legacy/` |
 
-- Consulta da utilização de CPU.
-- Consulta de memória RAM e swap, quando disponível.
-- Consulta de volumes de armazenamento.
-- Consulta de informações de rede.
-- Exibição de processos com maior consumo.
-- Apresentação de informações gerais do sistema.
-- Histórico temporário de CPU e RAM.
-- Registro de mensagens de alteração de estado.
-- Cadastro, conclusão e remoção de tarefas.
-- Identificação de tarefas diárias.
+## 4. Requisitos não funcionais
 
-## 4. Requisitos funcionais
+- **Segurança:** autenticação, papéis, CSRF, rate limiting, validação, HMAC nos agentes, segredos criptografados, auditoria ([seguranca.md](seguranca.md)).
+- **Desempenho:** coleta em camadas; processo auxiliar persistente no Windows; agregação incremental; interface sem bibliotecas pesadas (~50 KB de JS comprimido).
+- **Compatibilidade:** Windows e Linux (macOS quando possível); SQLite e PostgreSQL.
+- **Acessibilidade:** elementos da fazenda acessíveis por teclado e com descrição; gráficos com alternativa em tabela; animações reduzidas.
+- **Manutenibilidade:** módulos separados, regras puras testáveis, migrations, CI.
+- **Honestidade dos dados:** nada de valores aleatórios; sensor ausente é exibido como indisponível.
 
-| ID | Requisito |
-|---|---|
-| RF01 | O sistema deve apresentar a utilização total da CPU. |
-| RF02 | O sistema deve apresentar o uso de memória RAM. |
-| RF03 | O sistema deve apresentar informações dos volumes de armazenamento encontrados. |
-| RF04 | O sistema deve listar processos ordenados pelo consumo de CPU e memória. |
-| RF05 | O sistema deve apresentar informações de rede quando disponíveis. |
-| RF06 | O sistema deve apresentar informações do processador e do sistema operacional. |
-| RF07 | O sistema deve manter amostras temporárias de CPU e RAM durante a execução. |
-| RF08 | O sistema deve permitir adicionar tarefas. |
-| RF09 | O sistema deve permitir marcar e desmarcar tarefas como concluídas. |
-| RF10 | O sistema deve permitir excluir tarefas. |
-| RF11 | O sistema deve reiniciar o estado de conclusão das tarefas identificadas como diárias quando mudar a data. |
-| RF12 | O sistema deve disponibilizar uma rota simples para verificação de saúde. |
+## 5. Limites conhecidos
 
-## 5. Requisitos não funcionais
-
-- **RNF01 — Compatibilidade:** executar em Node.js 18 ou superior.
-- **RNF02 — Interface:** apresentar layout adaptável a diferentes tamanhos de tela.
-- **RNF03 — Usabilidade:** organizar métricas em seções temáticas.
-- **RNF04 — Manutenibilidade:** manter a configuração de dependências no `package.json`.
-- **RNF05 — Segurança:** não armazenar credenciais diretamente no código.
-- **RNF06 — Desempenho:** realizar as consultas de métricas em paralelo quando possível.
-
-## 6. Público-alvo
-
-Pessoas interessadas em visualizar métricas básicas do sistema por meio de uma interface web temática, além de estudantes que desejam estudar integração entre Node.js, bibliotecas de sistema e aplicações web.
-
-## 7. Limites conhecidos
-
-As métricas coletadas pertencem à máquina onde o servidor está em execução. Em uma hospedagem remota, elas não representam automaticamente o computador de quem acessa o site.
-
-O histórico de CPU e RAM é mantido em memória durante a execução do processo. Já as tarefas são armazenadas em arquivo JSON no diretório configurado por `DATA_DIR` ou, por padrão, na pasta do projeto.
-
-A disponibilidade de temperatura, informações de rede e alguns dados de hardware depende do sistema operacional e do ambiente de execução.
+As métricas pertencem à máquina onde o coletor roda. Uma hospedagem remota mostra o próprio servidor; para monitorar um computador pessoal, é preciso o agente instalado nele ([deploy.md](deploy.md)). Sensores de temperatura, ventoinhas e GPU dependem do sistema operacional e do hardware.

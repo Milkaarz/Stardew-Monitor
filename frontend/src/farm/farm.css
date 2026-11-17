@@ -1,0 +1,496 @@
+/* ===== cena da fazenda: animações em "passos" (efeito pixel) ===== */
+
+.farm-scene {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+  user-select: none;
+}
+
+.farm-scene.is-offline {
+  filter: grayscale(0.85);
+}
+
+.farm-scene text {
+  font-family: 'Press Start 2P', monospace;
+}
+
+.sign-text {
+  font-size: 4.6px;
+  fill: #3b2412;
+}
+
+.sign-text.big {
+  font-size: 7px;
+}
+
+.tiny-text {
+  font-size: 5px;
+  fill: #3b2412;
+}
+
+.tiny-text.alarm {
+  fill: #d9381e;
+  font-size: 7px;
+  animation: blink 0.6s steps(2) infinite;
+}
+
+.tiny-text.zzz {
+  fill: #fff;
+  font-size: 4px;
+  animation: zzz 2.6s steps(4) infinite;
+}
+
+.theme-mines .tiny-text,
+.theme-mines .sign-text {
+  fill: #3b2412;
+}
+
+/* ---- interação ---- */
+.hotspot {
+  cursor: pointer;
+  outline: none;
+}
+
+.hotspot .hit {
+  fill: transparent;
+}
+
+.hotspot:hover,
+.hotspot:focus-visible,
+.hotspot.focused {
+  filter: brightness(1.12) drop-shadow(0 0 1px #ffd23f) drop-shadow(0 0 1px #ffd23f);
+}
+
+.hotspot:focus-visible .hit {
+  stroke: #ffd23f;
+  stroke-width: 1;
+  stroke-dasharray: 2 2;
+}
+
+.sign {
+  transition: transform 0.15s;
+}
+
+/* ---- casa: fumaça e calor ---- */
+.smoke {
+  animation: smoke 3.2s steps(8) infinite;
+  opacity: 0;
+}
+
+.smoke-2 { animation-duration: 2.4s; }
+.smoke-3 { animation-duration: 1.6s; }
+
+@keyframes smoke {
+  0% { transform: translate(0, 0); opacity: 0.9; }
+  100% { transform: translate(8px, -26px) scale(1.6); opacity: 0; }
+}
+
+.heat {
+  animation: heat 0.8s steps(2) infinite;
+}
+
+@keyframes heat {
+  50% { transform: translateY(-2px); opacity: 0.6; }
+}
+
+.window-lit {
+  filter: drop-shadow(0 0 3px #ffd23f);
+}
+
+/* ---- moinho: velocidade = uso da GPU ---- */
+.blades {
+  transform-box: view-box;
+  transform-origin: 0 0;
+}
+
+.blades.speed-1 { animation: spin 7s steps(24) infinite; }
+.blades.speed-2 { animation: spin 3s steps(24) infinite; }
+.blades.speed-3 { animation: spin 1s steps(16) infinite; }
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---- silos ---- */
+.blink {
+  animation: blink 0.8s steps(2) infinite;
+}
+
+.silo-crit {
+  animation: shake 0.5s steps(2) infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0.15; }
+}
+
+@keyframes shake {
+  50% { transform: translateX(0.6px); }
+}
+
+/* ---- balão de alerta ---- */
+.bubble-inner {
+  animation: bob 1s steps(2) infinite;
+}
+
+.bubble-crit .bubble-inner {
+  animation-duration: 0.5s;
+}
+
+@keyframes bob {
+  50% { transform: translateY(-2px); }
+}
+
+/* ---- correio ---- */
+.flag {
+  transform-box: view-box;
+  transform-origin: 12.75px 7px;
+  transform: rotate(90deg);
+  transition: transform 0.4s steps(3);
+}
+
+.flag.up {
+  transform: rotate(0deg);
+}
+
+.letter-fly {
+  animation: letter 2.4s steps(8) infinite;
+}
+
+@keyframes letter {
+  0% { transform: translate(0, 0); opacity: 1; }
+  100% { transform: translate(18px, -30px); opacity: 0; }
+}
+
+/* ---- carroça: velocidade = rede ---- */
+.cart-idle {
+  transform: translateX(196px);
+}
+
+.cart-move {
+  animation: cart 20s linear infinite;
+}
+
+.cart-move.speed-1 { animation-duration: 26s; }
+.cart-move.speed-2 { animation-duration: 12s; }
+.cart-move.speed-3 { animation-duration: 5s; }
+
+@keyframes cart {
+  from { transform: translateX(-40px); }
+  to { transform: translateX(500px); }
+}
+
+/* ---- plantas ---- */
+.sway {
+  animation: sway 3s steps(2) infinite;
+}
+
+.wilt {
+  transform: skewX(-8deg);
+  opacity: 0.85;
+}
+
+@keyframes sway {
+  50% { transform: translateX(0.5px); }
+}
+
+/* ---- animais ---- */
+.chicken-walk {
+  animation: walk 9s steps(18) infinite alternate;
+}
+
+.chicken-peck {
+  animation: peck 1.4s steps(1) infinite;
+}
+
+.chicken-scared {
+  animation: scared 0.25s steps(2) infinite;
+}
+
+@keyframes walk {
+  from { transform: translateX(0); }
+  to { transform: translateX(14px); }
+}
+
+@keyframes peck {
+  50% { transform: translateY(1.5px); }
+}
+
+@keyframes scared {
+  50% { transform: translate(1px, -2px); }
+}
+
+.cow-graze {
+  animation: graze 3.6s steps(2) infinite;
+}
+
+@keyframes graze {
+  50% { transform: translateY(1px); }
+}
+
+.pig-dig {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: dig 0.5s steps(2) infinite;
+}
+
+.pig-sleep {
+  animation: breathe 3s steps(2) infinite;
+}
+
+@keyframes dig {
+  50% { transform: rotate(-10deg) translateY(1px); }
+}
+
+@keyframes breathe {
+  50% { transform: scaleY(0.96); }
+}
+
+.dirt {
+  animation: dirt 0.5s steps(2) infinite;
+}
+
+@keyframes dirt {
+  50% { transform: translateY(-3px); opacity: 0.5; }
+}
+
+.duck-bob {
+  animation: bob 1.8s steps(2) infinite;
+}
+
+.ripple {
+  animation: ripple 2.4s steps(3) infinite;
+}
+
+@keyframes ripple {
+  50% { transform: translateX(3px); opacity: 0.6; }
+}
+
+@keyframes zzz {
+  0% { transform: translate(0, 0); opacity: 1; }
+  100% { transform: translate(4px, -6px); opacity: 0; }
+}
+
+/* ---- céu ---- */
+.cloud {
+  animation-name: drift;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes drift {
+  from { transform: translateX(-60px); }
+  to { transform: translateX(540px); }
+}
+
+.twinkle {
+  animation: blink 2.2s steps(2) infinite;
+}
+
+.sun.big > * {
+  filter: drop-shadow(0 0 4px #ffb35a);
+}
+
+.crystal-glow {
+  animation: crystal 3s steps(3) infinite;
+}
+
+@keyframes crystal {
+  50% { opacity: 0.55; }
+}
+
+.waves {
+  animation: ripple 3s steps(3) infinite;
+}
+
+.smoke-volcano {
+  animation: smoke 4s steps(8) infinite;
+}
+
+/* ---- clima ---- */
+.rainfall {
+  animation: rain 0.45s linear infinite;
+}
+
+.snowfall {
+  animation: rain 3.5s linear infinite;
+}
+
+.snowfall.slow {
+  animation-duration: 7s;
+}
+
+.leaffall {
+  animation: leaves 9s linear infinite;
+}
+
+.leaffall.slow {
+  animation-duration: 14s;
+}
+
+@keyframes rain {
+  from { transform: translate(0, 0); }
+  to { transform: translate(-6px, 24px); }
+}
+
+@keyframes leaves {
+  from { transform: translate(0, 0); }
+  to { transform: translate(30px, 60px); }
+}
+
+.lightning {
+  opacity: 0;
+  animation: lightning 7s infinite;
+}
+
+@keyframes lightning {
+  0%, 92%, 96%, 100% { opacity: 0; }
+  93% { opacity: 0.6; }
+  94% { opacity: 0.1; }
+  95% { opacity: 0.45; }
+}
+
+.shimmer {
+  animation: heat 1s steps(2) infinite;
+}
+
+.wind {
+  animation: wind 3s linear infinite;
+}
+
+.wind-2 { animation-duration: 1.8s; }
+.wind-3 { animation-duration: 0.9s; }
+
+@keyframes wind {
+  from { transform: translateX(-40px); opacity: 0; }
+  20% { opacity: 1; }
+  to { transform: translateX(120px); opacity: 0; }
+}
+
+.firefly {
+  animation: blink 1.6s steps(2) infinite;
+}
+
+/* ---- HUD sobre a cena ---- */
+.farm-frame {
+  position: relative;
+  border: 6px solid var(--wood-800);
+  outline: 4px solid var(--wood-600);
+  outline-offset: -10px;
+  box-shadow: 0 6px 0 var(--wood-900);
+  background: #7cc4ec;
+  line-height: 0;
+  overflow: hidden;
+}
+
+.hud {
+  position: absolute;
+  line-height: 1.2;
+  pointer-events: none;
+}
+
+.hud > * {
+  pointer-events: auto;
+}
+
+.hud-date {
+  top: 8px;
+  right: 8px;
+}
+
+.hud-stamina {
+  right: 10px;
+  bottom: 10px;
+}
+
+.hud-message {
+  left: 8px;
+  top: 8px;
+  max-width: min(46%, 360px);
+}
+
+.status-card {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 10px;
+  background: var(--paper-2);
+  border: 4px solid var(--wood-800);
+  box-shadow: 0 4px 0 var(--wood-900), inset 0 0 0 2px var(--gold);
+  font-size: 1.15rem;
+}
+
+.status-card .face {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  background: #bfe6ff;
+  border: 3px solid var(--wood-800);
+}
+
+.stamina {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  background: var(--wood-600);
+  border: 4px solid var(--wood-800);
+  box-shadow: 0 4px 0 var(--wood-900);
+}
+
+.stamina .tube {
+  position: relative;
+  width: 16px;
+  height: 84px;
+  background: #3b2412;
+  border: 2px solid var(--wood-900);
+}
+
+.stamina .fill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, var(--lvl-light), var(--lvl));
+  transition: height 0.6s steps(10);
+}
+
+.stamina .e {
+  font-family: var(--font-pixel);
+  font-size: 0.45rem;
+  color: var(--gold);
+}
+
+.stamina .charging {
+  font-size: 0.9rem;
+}
+
+@media (max-width: 720px) {
+  .hud-message {
+    position: static;
+    max-width: none;
+    margin-top: 10px;
+  }
+
+  .hud-date {
+    top: 4px;
+    right: 4px;
+    transform: scale(0.85);
+    transform-origin: top right;
+  }
+
+  .hud-stamina {
+    transform: scale(0.75);
+    transform-origin: bottom right;
+  }
+}
+
+@media (max-width: 520px) {
+  /* a data já aparece na barra superior: libera a cena no celular */
+  .hud-date {
+    display: none;
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "@stardew-monitor/backend",
+  "version": "3.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Servidor central: API REST, SSE, alertas, conquistas, histórico e autenticação.",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "@stardew-monitor/agent": "3.0.0",
+    "@stardew-monitor/database": "3.0.0",
+    "@stardew-monitor/shared": "3.0.0",
+    "express": "^5.2.1",
+    "helmet": "^8.1.0",
+    "nodemailer": "^10.3.1",
+    "zod": "^4.6.7"
+  }
+}

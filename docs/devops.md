@@ -1,86 +1,67 @@
-# Processo de desenvolvimento e implantação
+# Desenvolvimento, testes e CI
 
-## 1. Ambiente
+## Ambiente
 
-- Node.js 18 ou superior.
-- npm.
-- Git.
-- Editor de código de preferência.
-
-## 2. Preparação
+- Node.js 22.13+ (recomendado 24), npm, Git.
 
 ```bash
-git clone https://github.com/Milkaarz/Stardew-Monitor.git
-cd Stardew-Monitor
 npm install
+npm run dev        # backend em http://localhost:3001 (reinicia ao salvar)
+npm run dev:web    # interface com recarga instantânea em http://localhost:5173 (repassa /api ao backend)
 ```
 
-## 3. Execução local
+## Scripts
 
-```bash
-npm start
-```
-
-A aplicação utiliza a porta `3000` por padrão. A variável `PORT` permite selecionar outra porta.
-
-## 4. Variáveis de ambiente
-
-| Variável | Descrição |
+| Script | O que faz |
 |---|---|
-| `PORT` | Porta do servidor HTTP |
-| `TZ_NAME` | Fuso horário usado na formatação de data e hora |
-| `DATA_DIR` | Diretório de armazenamento do arquivo de tarefas |
+| `npm start` | Servidor de produção (API + `frontend/dist`) |
+| `npm run dev` / `npm run dev:web` | Desenvolvimento |
+| `npm run build` | Compila a interface |
+| `npm run agent` | Roda o agente (usa `.env`) |
+| `npm run migrate` | Aplica migrations pendentes |
+| `npm run create-admin -- usuario senha` | Cria/redefine administrador |
+| `npm run lint` | ESLint |
+| `npm test` | Todos os testes (SQLite) |
+| `npm run test:pg` | Persistência + API no PostgreSQL (`TEST_DATABASE_URL` e `API_TEST_PG`) |
+| `npm run check` | lint + testes + build |
 
-Exemplo:
+## Testes
+
+Usam o executor nativo `node:test` e `supertest`:
+
+| Pasta | Cobre |
+|---|---|
+| `tests/unit/farm.test.js` | Conversão de métricas em indicadores visuais (plantação, fumaça, carroça, moinho, vento, clima, animais, estamina) |
+| `tests/unit/alerts.test.js` | Limites, sustentação, cooldown, agravamento, recuperação, mensagens |
+| `tests/unit/seasons-messages.test.js` | Estações, dia/noite, Páscoa, festivais, mensagens, formatação, progresso das conquistas |
+| `tests/unit/collector.test.js` | Cálculos e leitores de cada SO, proteção de processos e **uma coleta real** na máquina que roda o teste |
+| `tests/unit/agent.test.js` | Assinatura agente↔servidor, configuração, buffer offline, comandos |
+| `tests/unit/frontend.test.js` | Paleta da cena para todos os temas/estações/horários |
+| `tests/api/auth.test.js` | Login, sessão, CSRF, papéis, troca de senha, rate limit, cabeçalhos |
+| `tests/api/api.test.js` | Todos os endpoints, agentes (assinatura, replay, despedida, sem sinal), histórico, diário, missões, conquistas, alertas e canais, segredos, processos e expulsão (com um processo real descartável), compatibilidade |
+| `tests/integration/persistence.test.js` | Migrations, deduplicação, agregação ponderada, retenção e reinício do servidor no mesmo banco |
+
+Para rodar no PostgreSQL localmente:
 
 ```bash
-PORT=3000 TZ_NAME=America/Sao_Paulo npm start
+docker run -d --name pg -e POSTGRES_PASSWORD=stardew -p 5432:5432 postgres:17-alpine
+TEST_DATABASE_URL=postgres://postgres:stardew@localhost:5432/postgres \
+API_TEST_PG=postgres://postgres:stardew@localhost:5432/postgres npm run test:pg
 ```
 
-No PowerShell:
+## Integração contínua
 
-```powershell
-$env:PORT = "3000"
-$env:TZ_NAME = "America/Sao_Paulo"
-npm start
-```
+`.github/workflows/ci.yml`, em todo push para `main` e em pull requests:
 
-## 5. Fluxo Git sugerido
+1. **test** (Ubuntu Node 22 e 24, Windows Node 24): `npm ci` → lint → testes → build;
+2. **postgres**: suíte de persistência e API com um serviço PostgreSQL 17;
+3. **docker**: build das imagens do servidor e do agente.
 
-1. Atualizar a branch principal.
-2. Criar uma branch para a tarefa.
-3. Implementar a alteração.
-4. Executar testes manuais e verificações pertinentes.
-5. Revisar o diff.
-6. Abrir Pull Request.
-7. Integrar a alteração após revisão.
+## Convenções
 
-Exemplo:
-
-```bash
-git switch main
-git pull
-git switch -c feat/nova-funcionalidade
-```
-
-## 6. Verificações antes da publicação
-
-- Confirmar que `npm install` termina sem erros.
-- Confirmar que `npm start` inicia o servidor.
-- Acessar `/` e verificar a renderização do painel.
-- Acessar `/health` e confirmar a resposta `ok`.
-- Testar o fluxo de adicionar, concluir e excluir tarefas.
-- Conferir a persistência de `tarefas.json`.
-- Verificar a configuração de `PORT`, `TZ_NAME` e `DATA_DIR`.
-
-## 7. Implantação
-
-O projeto pode ser executado em um ambiente que ofereça Node.js 18 ou superior. Configure o comando de instalação como `npm install` e o comando de inicialização como `npm start`.
-
-A plataforma de hospedagem deve permitir que o processo Node.js consulte as informações do ambiente e tenha permissão de escrita no diretório configurado para os dados das tarefas.
-
-**Atenção:** em hospedagens com sistema de arquivos temporário, o arquivo `tarefas.json` pode não sobreviver a reinicializações ou novas implantações. Para persistência durável, utilize um volume persistente ou adapte o projeto para um banco de dados.
-
-## 8. Logs e diagnóstico
-
-O servidor registra no console a inicialização e erros ocorridos durante a coleta. A rota `/health` pode ser utilizada por verificações externas para confirmar que o processo responde.
+- Código em módulos ES; regras de negócio puras em `shared/` (fáceis de testar).
+- Sensor ausente = `null`. Nunca preencher com valores fictícios.
+- Toda entrada da API passa por um esquema zod (`backend/src/schemas.js`).
+- Toda operação administrativa registra auditoria.
+- Mudanças no banco = nova migration em `database/migrations/` (nunca editar uma já publicada).
+- Antes de abrir um PR: `npm run check`.
