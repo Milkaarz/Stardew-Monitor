@@ -7,7 +7,7 @@ Não é só ilustração: todos os números vêm de leituras reais **do computad
 > Projeto de fã, inspirado na estética de jogos de fazenda em pixel art. Toda a arte é original, desenhada em código (SVG); nenhum recurso de jogo é usado.
 
 - **🌐 Site:** [tubular-dieffenbachia-164159.netlify.app](https://tubular-dieffenbachia-164159.netlify.app/) — página de entrada: explica como funciona, leva ao download e, se o aplicativo já estiver aberto no seu computador, abre o seu painel.
-- **⬇️ Download:** [Releases do GitHub](https://github.com/Milkaarz/Stardew-Monitor/releases/latest)
+- **⬇️ Download (Windows):** [StardewMonitor-windows-x64.exe](https://github.com/Milkaarz/Stardew-Monitor/raw/main/release/StardewMonitor-windows-x64.exe) · [pasta `release`](https://github.com/Milkaarz/Stardew-Monitor/tree/main/release)
 - **📍 Demo da versão 2 (modo agente + hospedagem PHP):** [mizzie.nyx.dev.br/stardew](https://mizzie.nyx.dev.br/stardew/)
 
 ---
@@ -31,10 +31,10 @@ Não é só ilustração: todos os números vêm de leituras reais **do computad
 
 ## ⬇️ Baixar e usar (recomendado)
 
-1. Baixe o aplicativo do seu sistema na página [**Releases**](https://github.com/Milkaarz/Stardew-Monitor/releases/latest) do GitHub:
-   - Windows: `StardewMonitor-windows-x64.exe`
-   - Linux: `StardewMonitor-linux-x64` (depois `chmod +x StardewMonitor-linux-x64`)
-2. Abra o arquivo (dois cliques). Não precisa instalar nada, nem Node.js.
+1. Baixe o aplicativo na pasta [**`release`**](https://github.com/Milkaarz/Stardew-Monitor/tree/main/release) do repositório:
+   - Windows: [`StardewMonitor-windows-x64.exe`](https://github.com/Milkaarz/Stardew-Monitor/raw/main/release/StardewMonitor-windows-x64.exe) (≈90 MB). Na página do arquivo, clique em **Download raw** (ou no ícone de download).
+   - Linux: gere o executável pelo código-fonte (veja "Gerar o aplicativo você mesmo").
+2. Abra o arquivo (dois cliques). Não precisa instalar nada, nem Node.js: o arquivo já é o programa e funciona de qualquer pasta.
 3. O navegador abre sozinho em **http://localhost:3001** com a fazenda **deste** computador.
 4. Para encerrar, feche a janela do aplicativo.
 
@@ -51,14 +51,18 @@ npm run app:build      # cria release/StardewMonitor-<sistema>-<arquitetura>
 
 O executável sai para o sistema de quem roda o comando (no Windows, o `.exe`).
 
-### Publicar uma versão para download
+### Atualizar o arquivo para download
+
+O executável disponível para download fica em [`release/`](https://github.com/Milkaarz/Stardew-Monitor/tree/main/release), no próprio repositório. Para publicar uma versão nova:
 
 ```bash
-git tag v3.0.0
-git push --tags
+npm run app:build
+git add -f release/StardewMonitor-windows-x64.exe
+git commit -m "Atualiza o aplicativo"
+git push
 ```
 
-O GitHub Actions gera os executáveis de Windows e Linux, testa se cada um abre e responde e cria a Release com os arquivos anexados. O botão "Baixar o aplicativo" do site aponta para a Release mais recente.
+O botão de download do site e os links deste README apontam para esse arquivo, então passam a entregar a versão nova assim que o push chegar ao GitHub. (O `-f` é necessário porque a pasta `release/` está no `.gitignore`; o GitHub aceita arquivos de até 100 MB.)
 
 ## 🧑‍💻 Rodar pelo código-fonte
 
@@ -78,7 +82,7 @@ Um site na internet não consegue ler o hardware de quem o visita, e uma hospeda
 
 ### E o site no Netlify?
 
-O site publicado (Netlify) contém só a interface, sem o servidor: ele **não consegue** mostrar os dados de ninguém. Aberto fora do aplicativo, ele vira uma página de entrada com o passo a passo e o botão de download, e verifica se o aplicativo está aberto no seu computador (`localhost:3001` a `3005`) para oferecer "Abrir meu painel". Num site HTTPS, o navegador pode pedir permissão para acessar a rede local antes dessa verificação.
+O site publicado (Netlify) contém só a interface, sem o servidor: ele **não consegue** mostrar os dados de ninguém. Aberto fora do aplicativo, ele vira uma página de entrada com o passo a passo e o botão de download (o arquivo da pasta `release`), e verifica se o aplicativo está aberto no seu computador (`localhost:3001` a `3005`) para oferecer "Abrir meu painel". Num site HTTPS, o navegador pode pedir permissão para acessar a rede local antes dessa verificação.
 
 Para atualizar o site, basta enviar as mudanças ao GitHub (o Netlify publica de novo).
 
@@ -124,7 +128,7 @@ npm run test:pg   # persistência + API no PostgreSQL (defina TEST_DATABASE_URL 
 npm run build
 ```
 
-O GitHub Actions roda tudo isso em Linux e Windows, mais a suíte no PostgreSQL, o build do Docker e gera os executáveis (anexados à Release quando uma tag `v*` é criada).
+O GitHub Actions roda tudo isso em Linux e Windows, mais a suíte no PostgreSQL e o build do Docker, e gera os executáveis de Windows e Linux como artefatos de cada execução.
 
 ## ⚠️ Limitações conhecidas
 

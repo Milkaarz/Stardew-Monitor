@@ -6,13 +6,12 @@
 import { useEffect, useState } from 'preact/hooks';
 import { Panel } from './ui.jsx';
 
-export const RELEASES_URL = 'https://github.com/Milkaarz/Stardew-Monitor/releases/latest';
-// link direto para o arquivo da versão mais recente (o nome precisa ser igual ao anexado na Release)
+// O executável fica na pasta release/ do repositório (branch main).
+export const RELEASES_URL = 'https://github.com/Milkaarz/Stardew-Monitor/tree/main/release';
 const DOWNLOADS = {
   windows: { file: 'StardewMonitor-windows-x64.exe', label: 'Baixar para Windows (.exe, ~90 MB)' },
-  linux: { file: 'StardewMonitor-linux-x64', label: 'Baixar para Linux (~100 MB)' },
 };
-const downloadUrl = (file) => `${RELEASES_URL}/download/${file}`;
+const downloadUrl = (file) => `https://github.com/Milkaarz/Stardew-Monitor/raw/main/release/${file}`;
 
 function detectOs() {
   const ua = `${navigator.userAgentData?.platform || ''} ${navigator.userAgent}`.toLowerCase();
@@ -87,13 +86,13 @@ export function HostedLanding() {
             ))}
           </div>
           <p class="muted">
-            Arquivos: <code>StardewMonitor-windows-x64.exe</code> e <code>StardewMonitor-linux-x64</code> ·{' '}
-            <a href={RELEASES_URL} target="_blank" rel="noopener">todas as versões e somas SHA-256</a>
+            Arquivo: <code>StardewMonitor-windows-x64.exe</code> ·{' '}
+            <a href={RELEASES_URL} target="_blank" rel="noopener">ver a pasta de downloads no GitHub</a> · Linux: gere pelo código-fonte
           </p>
 
           <h3 style={{ marginTop: '18px' }}>2. Abra o arquivo</h3>
           <p>
-            Dê dois cliques (no Linux: <code>chmod +x StardewMonitor-linux-x64</code> e depois execute). Uma janela mostra o endereço do painel. Na primeira vez o Windows pode avisar que o arquivo não tem
+            Dê dois cliques. Uma janela mostra o endereço do painel. Na primeira vez o Windows pode avisar que o arquivo não tem
             assinatura digital: clique em <b>Mais informações → Executar assim mesmo</b>.
           </p>
 
