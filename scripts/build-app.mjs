@@ -16,8 +16,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
+import { makeIco } from './make-icon.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = path.join(ROOT, 'build', 'app');
@@ -86,6 +88,27 @@ const osName = { win32: 'windows', linux: 'linux', darwin: 'macos' }[process.pla
 const exe = path.join(RELEASE, `StardewMonitor-${osName}-${arch}${WIN ? '.exe' : ''}`);
 fs.rmSync(exe, { force: true });
 fs.copyFileSync(process.execPath, exe);
+if (WIN) {
+  // ícone, nome e versão próprios (senão o Windows mostra "Node.js" nas propriedades do arquivo).
+  // Precisa ser feito ANTES de embutir o aplicativo.
+  const { rcedit } = await import('rcedit');
+  const icon = path.join(OUT, 'icon.ico');
+  fs.writeFileSync(icon, makeIco());
+  const version = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')).version;
+  await rcedit(exe, {
+    icon,
+    'file-version': version,
+    'product-version': version,
+    'version-string': {
+      ProductName: 'Stardew Monitor',
+      FileDescription: 'Stardew Monitor - monitor de hardware em pixel art',
+      CompanyName: 'Stardew Monitor (projeto de fã)',
+      LegalCopyright: 'MIT License',
+      OriginalFilename: path.basename(exe),
+      InternalName: 'StardewMonitor',
+    },
+  });
+}
 if (process.platform === 'darwin') {
   try {
     execFileSync('codesign', ['--remove-signature', exe]);
@@ -103,6 +126,11 @@ if (process.platform === 'darwin') {
   }
 }
 if (!WIN) fs.chmodSync(exe, 0o755);
+
+// soma de verificação, para quem quiser conferir o download
+const sha = crypto.createHash('sha256').update(fs.readFileSync(exe)).digest('hex');
+fs.writeFileSync(`${exe}.sha256`, `${sha}  ${path.basename(exe)}
+`);
 
 step('4/4 Pronto');
 const mb = (fs.statSync(exe).size / 1048576).toFixed(0);

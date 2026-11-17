@@ -7,6 +7,19 @@ import { useEffect, useState } from 'preact/hooks';
 import { Panel } from './ui.jsx';
 
 export const RELEASES_URL = 'https://github.com/Milkaarz/Stardew-Monitor/releases/latest';
+// link direto para o arquivo da versão mais recente (o nome precisa ser igual ao anexado na Release)
+const DOWNLOADS = {
+  windows: { file: 'StardewMonitor-windows-x64.exe', label: 'Baixar para Windows (.exe, ~90 MB)' },
+  linux: { file: 'StardewMonitor-linux-x64', label: 'Baixar para Linux (~100 MB)' },
+};
+const downloadUrl = (file) => `${RELEASES_URL}/download/${file}`;
+
+function detectOs() {
+  const ua = `${navigator.userAgentData?.platform || ''} ${navigator.userAgent}`.toLowerCase();
+  if (ua.includes('win')) return 'windows';
+  if (ua.includes('linux') && !ua.includes('android')) return 'linux';
+  return null;
+}
 const PORTS = [3001, 3002, 3003, 3004, 3005];
 
 /**
@@ -26,6 +39,7 @@ async function findLocalApp() {
 }
 
 export function HostedLanding() {
+  const os = detectOs();
   const [local, setLocal] = useState({ checking: true, url: null });
   const check = () => {
     setLocal({ checking: true, url: null });
@@ -62,15 +76,24 @@ export function HostedLanding() {
             <div class="notice warn">O aplicativo não está aberto neste computador (ou o navegador bloqueou a verificação).</div>
           )}
 
-          <h3 style={{ marginTop: '18px' }}>1. Baixe o aplicativo</h3>
+          <h3 style={{ marginTop: '18px' }}>1. Baixe o aplicativo Stardew Monitor</h3>
+          <p>
+            É um único arquivo: o próprio monitor, com a fazenda dentro. Ele lê os dados do computador onde for aberto e
+            mostra o painel no navegador. Não instala nada no sistema e não precisa de internet para funcionar.
+          </p>
           <div class="row">
-            <a class="btn" href={RELEASES_URL} target="_blank" rel="noopener">⬇️ Baixar o aplicativo</a>
-            <span class="muted">Windows: StardewMonitor-windows-x64.exe · Linux: StardewMonitor-linux-x64</span>
+            {(os ? [os, ...Object.keys(DOWNLOADS).filter((k) => k !== os)] : Object.keys(DOWNLOADS)).map((k, i) => (
+              <a key={k} class={`btn ${i === 0 && os ? '' : 'light'}`} href={downloadUrl(DOWNLOADS[k].file)}>⬇️ {DOWNLOADS[k].label}</a>
+            ))}
           </div>
+          <p class="muted">
+            Arquivos: <code>StardewMonitor-windows-x64.exe</code> e <code>StardewMonitor-linux-x64</code> ·{' '}
+            <a href={RELEASES_URL} target="_blank" rel="noopener">todas as versões e somas SHA-256</a>
+          </p>
 
           <h3 style={{ marginTop: '18px' }}>2. Abra o arquivo</h3>
           <p>
-            Dê dois cliques. Não precisa instalar nada. Na primeira vez o Windows pode avisar que o arquivo não tem
+            Dê dois cliques (no Linux: <code>chmod +x StardewMonitor-linux-x64</code> e depois execute). Uma janela mostra o endereço do painel. Na primeira vez o Windows pode avisar que o arquivo não tem
             assinatura digital: clique em <b>Mais informações → Executar assim mesmo</b>.
           </p>
 
