@@ -1,0 +1,26 @@
+{
+  "main": "E:\\Usuários\\User\\Músicas\\Stardew Monitor\\Stardew-Monitor\\build\\app\\main.cjs",
+  "output": "E:\\Usuários\\User\\Músicas\\Stardew Monitor\\Stardew-Monitor\\build\\app\\sea-prep.blob",
+  "disableExperimentalSEAWarning": true,
+  "useSnapshot": false,
+  "useCodeCache": false,
+  "assets": {
+    "web/assets/index-Bgrw2f0Y.js": "E:\\Usuários\\User\\Músicas\\Stardew Monitor\\Stardew-Monitor\\frontend\\dist\\assets\\index-Bgrw2f0Y.js",
+    "web/assets/index-Bn18vEqw.css": "E:\\Usuários\\User\\Músicas\\Stardew Monitor\\Stardew-Monitor\\frontend\\dist\\assets\\index-Bn18vEqw.css",
+    "web/assets/press-start-2p-cyrillic-400-normal-DBn7fddJ.woff2": "E:\\Usuários\\User\\Músicas\\Stardew Monitor\\Stardew-Monitor\\frontend\\dist\\assets\\press-start-2p-cyrillic-400-normal-DBn7fddJ.woff2",
+    "web/assets/press-start-2p-cyrillic-ext-400-normal-CIYZrvmP.woff2": "E:\\Usuários\\User\\Músicas\\Stardew Monitor\\Stardew-Monitor\\frontend\\dist\\assets\\press-start-2p-cyrillic-ext-400-normal-CIYZrvmP.woff2",
+    "web/assets/press-start-2p-greek-400-normal-DQfalijU.woff2": "E:\\Usuários\\User\\Músicas\\Stardew Monitor\\Stardew-Monitor\\frontend\\dist\\assets\\press-start-2p-greek-400-normal-DQfalijU.woff2",
+    "web/assets/press-start-2p-latin-400-normal-KLytu4cr.woff": "E:\\Usuários\\User\\Músicas\\Stardew Monitor\\Stardew-Monitor\\frontend\\dist\\assets\\press-start-2p-latin-400-normal-KLytu4cr.woff",
+    "web/assets/press-start-2p-latin-400-normal-_wFEWmAB.woff2": "E:\\Usuários\\User\\Músicas\\Stardew Monitor\\Stardew-Monitor\\frontend\\dist\\assets\\press-start-2p-latin-400-normal-_wFEWmAB.woff2",
+    "web/assets/press-start-2p-latin-ext-400-normal-DBgyq7ky.woff": "E:\\Usuários\\User\\Músicas\\Stardew Monitor\\Stardew-Monitor\\frontend\\dist\\assets\\press-start-2p-latin-ext-400-normal-DBgyq7ky.woff",
+    "web/assets/press-start-2p-latin-ext-400-normal-DpfYvR5A.woff2": "E:\\Usuários\\User\\Músicas\\Stardew Monitor\\Stardew-Monitor\\frontend\\dist\\assets\\press-start-2p-latin-ext-400-normal-DpfYvR5A.woff2",
+    "web/assets/vt323-latin-400-normal-Dqn9ZSPj.woff": "E:\\Usuários\\User\\Músicas\\Stardew Monitor\\Stardew-Monitor\\frontend\\dist\\assets\\vt323-latin-400-normal-Dqn9ZSPj.woff",
+    "web/assets/vt323-latin-400-normal-wDgJuOC9.woff2": "E:\\Usuários\\User\\Músicas\\Stardew Monitor\\Stardew-Monitor\\frontend\\dist\\assets\\vt323-latin-400-normal-wDgJuOC9.woff2",
+    "web/assets/vt323-latin-ext-400-normal-DqOq58ri.woff": "E:\\Usuários\\User\\Músicas\\Stardew Monitor\\Stardew-Monitor\\frontend\\dist\\assets\\vt323-latin-ext-400-normal-DqOq58ri.woff",
+    "web/assets/vt323-latin-ext-400-normal-iUdYUaX4.woff2": "E:\\Usuários\\User\\Músicas\\Stardew Monitor\\Stardew-Monitor\\frontend\\dist\\assets\\vt323-latin-ext-400-normal-iUdYUaX4.woff2",
+    "web/assets/vt323-vietnamese-400-normal-D0VnvwZ9.woff2": "E:\\Usuários\\User\\Músicas\\Stardew Monitor\\Stardew-Monitor\\frontend\\dist\\assets\\vt323-vietnamese-400-normal-D0VnvwZ9.woff2",
+    "web/assets/vt323-vietnamese-400-normal-D_5Q7Vcv.woff": "E:\\Usuários\\User\\Músicas\\Stardew Monitor\\Stardew-Monitor\\frontend\\dist\\assets\\vt323-vietnamese-400-normal-D_5Q7Vcv.woff",
+    "web/favicon.svg": "E:\\Usuários\\User\\Músicas\\Stardew Monitor\\Stardew-Monitor\\frontend\\dist\\favicon.svg",
+    "web/index.html": "E:\\Usuários\\User\\Músicas\\Stardew Monitor\\Stardew-Monitor\\frontend\\dist\\index.html"
+  }
+}
