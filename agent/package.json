@@ -1,0 +1,25 @@
+{
+  "name": "@stardew-monitor/agent",
+  "version": "3.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Agente leve: coleta as métricas da máquina e envia ao servidor central.",
+  "bin": {
+    "stardew-agent": "./src/index.js"
+  },
+  "exports": {
+    ".": "./src/index.js",
+    "./collector": "./src/collector/index.js",
+    "./client": "./src/client.js",
+    "./actions": "./src/actions.js",
+    "./agent": "./src/agent.js",
+    "./config": "./src/config.js"
+  },
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "@stardew-monitor/shared": "3.0.0",
+    "systeminformation": "^5.25.11"
+  }
+}

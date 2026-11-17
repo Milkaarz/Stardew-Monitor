@@ -1,0 +1,462 @@
+/* ===== estilos específicos das páginas ===== */
+
+.footer {
+  margin-top: 28px;
+  text-align: center;
+  font-size: 1rem;
+  color: #fff;
+  text-shadow: 1px 1px 0 #000;
+  opacity: 0.85;
+}
+
+/* ---------- login ---------- */
+.login-wrap {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+}
+
+.login-card {
+  width: min(420px, 100%);
+}
+
+.login-card .logo {
+  justify-content: center;
+  margin: 0 0 18px;
+}
+
+/* ---------- fazenda ---------- */
+.farm-layout {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 1100px) {
+  .farm-layout.with-detail {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    align-items: start;
+  }
+}
+
+.resource-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.resource-card .head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.resource-card .big {
+  font-family: var(--font-pixel);
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.resource-card .sub {
+  color: var(--ink-soft);
+  font-size: 1.1rem;
+}
+
+.detail-panel {
+  position: sticky;
+  top: 12px;
+}
+
+.cores {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(54px, 1fr));
+  gap: 6px;
+}
+
+.core {
+  text-align: center;
+  font-size: 1rem;
+}
+
+.core .col {
+  position: relative;
+  height: 44px;
+  background: #3b2412;
+  border: 3px solid var(--wood-800);
+}
+
+.core .col > div {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, var(--lvl-light), var(--lvl));
+  transition: height 0.5s steps(8);
+}
+
+/* ---------- Pelican Town ---------- */
+.town-map {
+  position: relative;
+  padding: 18px;
+  background:
+    linear-gradient(0deg, rgba(0, 0, 0, 0.05) 2px, transparent 2px) 0 0 / 24px 24px,
+    linear-gradient(90deg, rgba(0, 0, 0, 0.05) 2px, transparent 2px) 0 0 / 24px 24px,
+    linear-gradient(180deg, #6dbbe8 0 70px, #5cbf4a 70px);
+  border: 6px solid var(--wood-800);
+  box-shadow: var(--shadow-drop);
+}
+
+[data-ui='mines'] .town-map {
+  background:
+    linear-gradient(0deg, rgba(255, 255, 255, 0.04) 2px, transparent 2px) 0 0 / 24px 24px,
+    linear-gradient(180deg, #141220 0 70px, #2a2638 70px);
+}
+
+.town-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
+  gap: 22px;
+  padding-top: 40px;
+}
+
+.town-house {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 8px 12px;
+  background: rgba(255, 243, 196, 0.85);
+  border: 4px solid var(--wood-800);
+  box-shadow: 0 4px 0 var(--wood-900), inset 0 -6px 0 var(--lvl);
+  cursor: pointer;
+  text-align: center;
+  transition: transform 0.12s;
+  color: #3b2412;
+}
+
+.town-house:hover,
+.town-house:focus-visible {
+  transform: translateY(-3px);
+}
+
+.town-house svg {
+  width: 96px;
+  height: 80px;
+}
+
+.town-house .name {
+  font-family: var(--font-pixel);
+  font-size: 0.55rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.town-house .mini {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  width: 100%;
+  font-size: 1rem;
+}
+
+.town-house.status-offline svg {
+  filter: grayscale(1) brightness(0.9);
+}
+
+.town-house.status-crit svg {
+  animation: shake 0.5s steps(2) infinite;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.token-box {
+  font-family: monospace;
+  font-size: 0.95rem;
+  word-break: break-all;
+  padding: 10px;
+  background: #2b1a0b;
+  color: #cfeaa0;
+  border: 4px solid var(--wood-800);
+  user-select: all;
+}
+
+pre.code {
+  margin: 0;
+  overflow-x: auto;
+  padding: 10px 12px;
+  background: #2b1a0b;
+  color: #cfeaa0;
+  border: 4px solid var(--wood-800);
+  font-family: monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+/* ---------- gráficos ---------- */
+.chart {
+  position: relative;
+}
+
+.chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #2b1a0b;
+  border: 4px solid var(--wood-800);
+  box-shadow: inset 0 3px 0 #1f1208;
+}
+
+.chart .tooltip {
+  position: absolute;
+  top: 8px;
+  pointer-events: none;
+  padding: 6px 8px;
+  background: var(--paper-2);
+  border: 3px solid var(--wood-800);
+  box-shadow: 0 3px 0 var(--wood-900);
+  font-size: 1.05rem;
+  white-space: nowrap;
+  z-index: 2;
+}
+
+.chart .legend-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 6px;
+  font-size: 1.05rem;
+}
+
+.swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 4px;
+  vertical-align: -1px;
+  box-shadow: 0 0 0 2px var(--wood-800);
+}
+
+/* ---------- processos ---------- */
+.proc-name {
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lock {
+  font-size: 1rem;
+}
+
+/* ---------- diário ---------- */
+.diary {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 960px) {
+  .diary {
+    grid-template-columns: 320px minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+.note-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 70vh;
+  overflow: auto;
+  border: 4px solid var(--wood-800);
+  background: var(--paper-2);
+}
+
+.note-list .day {
+  position: sticky;
+  top: 0;
+  padding: 4px 10px;
+  font-family: var(--font-pixel);
+  font-size: 0.45rem;
+  line-height: 1.8;
+  background: var(--wood-600);
+  color: var(--gold);
+}
+
+.note-list button {
+  all: unset;
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  cursor: pointer;
+  border-bottom: 2px solid var(--paper-line);
+}
+
+.note-list button:hover,
+.note-list button[aria-current='true'] {
+  background: var(--paper-3);
+}
+
+.note-list small {
+  display: block;
+  color: var(--ink-soft);
+  font-size: 1rem;
+}
+
+.saved-state {
+  font-size: 1rem;
+  color: var(--ink-soft);
+}
+
+/* ---------- missões ---------- */
+.quests {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 14px;
+  border: 4px solid var(--wood-800);
+  background: var(--paper-2);
+}
+
+.quests li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  border-bottom: 2px solid var(--paper-line);
+}
+
+.quests li:last-child {
+  border-bottom: 0;
+}
+
+.quests li.done .text {
+  text-decoration: line-through;
+  opacity: 0.55;
+}
+
+.quests .text {
+  flex: 1;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- conquistas ---------- */
+.achievements {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+  gap: 14px;
+}
+
+.achievement {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 10px;
+  background: var(--paper-2);
+  border: 4px solid var(--wood-800);
+  box-shadow: 0 4px 0 var(--wood-900);
+}
+
+.achievement.locked {
+  opacity: 0.75;
+}
+
+.achievement.locked svg {
+  filter: grayscale(1) brightness(0.8);
+}
+
+.achievement svg {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  background: var(--paper-3);
+  border: 3px solid var(--wood-800);
+}
+
+.achievement b {
+  display: block;
+  font-family: var(--font-pixel);
+  font-size: 0.5rem;
+  line-height: 1.6;
+}
+
+.achievement.unlocked {
+  box-shadow: 0 4px 0 var(--wood-900), inset 0 0 0 3px var(--gold);
+}
+
+/* ---------- avisos ---------- */
+.notif-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.notif-list li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 4px 12px;
+  padding: 10px 0;
+  border-bottom: 3px dotted var(--paper-line);
+}
+
+.notif-list li:last-child {
+  border-bottom: 0;
+}
+
+.notif-list li.unread b {
+  color: var(--crit);
+}
+
+.notif-list b {
+  font-family: var(--font-pixel);
+  font-size: 0.5rem;
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+.thresholds {
+  display: grid;
+  gap: 12px;
+}
+
+.threshold-row {
+  display: grid;
+  grid-template-columns: minmax(130px, 1.3fr) repeat(4, minmax(80px, 1fr));
+  gap: 8px;
+  align-items: end;
+  padding-bottom: 10px;
+  border-bottom: 3px dotted var(--paper-line);
+}
+
+@media (max-width: 720px) {
+  .threshold-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.topbar .muted {
+  color: #fff;
+  text-shadow: 1px 1px 0 #000;
+}
+
+.notif-list .pill {
+  align-self: start;
+  justify-content: center;
+}
+
+.stack > .check {
+  display: flex;
+}

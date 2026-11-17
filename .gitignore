@@ -1,12 +1,22 @@
 # dependências (quem clonar roda "npm install")
 node_modules/
 
-# configuração com senha do agente (use o .env.example como modelo)
+# configuração local com segredos (use o .env.example como modelo)
 .env
+.env.*
+!.env.example
 
-# dado gerado pelo receber.php no servidor
-dados.json
+# banco SQLite, segredo gerado e demais dados de execução
+data/
 
+# build da interface
+frontend/dist/
+
+# modo legado (hospedagem PHP): dados gerados no servidor
+legacy/site/dados.json
+legacy/site/visitas.txt
 
 *.log
+coverage/
 .DS_Store
+Thumbs.db

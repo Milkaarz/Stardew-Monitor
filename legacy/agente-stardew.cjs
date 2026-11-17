@@ -125,11 +125,11 @@ async function coletar() {
 /* =========================
    Dados completos do painel local (núcleos, discos, processos, rede...)
    O agente pede ao index.js, que já roda no mesmo PC, e junta com os dados abaixo.
-   Opcional no .env: PAINEL_LOCAL (padrão http://localhost:3000) e PAINEL_SENHA (se o painel tiver senha)
+   Opcional no .env: PAINEL_LOCAL (padrão http://localhost:3001) e PAINEL_SENHA (= LEGACY_API_TOKEN do servidor v3)
 ========================= */
 async function dadosLocais() {
   try {
-    const base = process.env.PAINEL_LOCAL || "http://localhost:" + (process.env.PORT || 3000);
+    const base = process.env.PAINEL_LOCAL || "http://localhost:" + (process.env.PORT || 3001);
     const headers = process.env.PAINEL_SENHA
       ? { Authorization: "Basic " + Buffer.from("agente:" + process.env.PAINEL_SENHA).toString("base64") }
       : {};

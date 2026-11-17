@@ -1,0 +1,59 @@
+# Stardew Monitor com Docker Compose.
+#
+#   Somente o servidor (SQLite):           docker compose up -d
+#   Servidor + PostgreSQL:                  docker compose --profile postgres up -d
+#                                           (e defina DATABASE_URL=postgres://stardew:stardew@postgres:5432/stardew no .env)
+#   Agente Linux em contêiner (opcional):   docker compose --profile agent up -d
+#
+# Copie .env.example para .env antes (ADMIN_PASSWORD e APP_SECRET, no mínimo).
+
+services:
+  app:
+    build: .
+    image: stardew-monitor:latest
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      NODE_ENV: production
+      DATA_DIR: /app/data
+    ports:
+      - "${PORT:-3001}:3001"
+    volumes:
+      - stardew-data:/app/data
+
+  postgres:
+    image: postgres:17-alpine
+    profiles: ["postgres"]
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: stardew
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-stardew}
+      POSTGRES_DB: stardew
+    volumes:
+      - stardew-pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U stardew"]
+      interval: 10s
+      retries: 5
+
+  agent:
+    build:
+      context: .
+      dockerfile: agent/Dockerfile
+    profiles: ["agent"]
+    restart: unless-stopped
+    pid: host
+    network_mode: host
+    environment:
+      STARDEW_SERVER_URL: ${STARDEW_SERVER_URL:-http://localhost:3001}
+      STARDEW_AGENT_TOKEN: ${STARDEW_AGENT_TOKEN:-}
+      STARDEW_INTERVAL: ${STARDEW_INTERVAL:-10}
+    volumes:
+      - /sys:/sys:ro
+      - /etc/os-release:/etc/os-release:ro
+
+volumes:
+  stardew-data:
+  stardew-pg:

@@ -1,50 +1,32 @@
-# Checklist de revisão do projeto
+# Checklist de revisão
 
-Use esta lista antes de publicar alterações ou uma nova versão.
+Use antes de publicar alterações ou uma nova versão.
+
+## Código
+
+- [ ] `npm run check` passa (lint + testes + build).
+- [ ] Mudanças no banco estão numa **nova** migration.
+- [ ] Toda entrada nova da API tem esquema de validação.
+- [ ] Ações administrativas novas registram auditoria.
+- [ ] Nenhum valor fictício: sensor ausente aparece como indisponível.
+- [ ] Nada de segredo no frontend, em logs ou em respostas da API.
+
+## Interface
+
+- [ ] Funciona em ~400 px de largura (celular) e em telas largas.
+- [ ] Elementos clicáveis da fazenda respondem a teclado (Enter/Espaço) e têm descrição.
+- [ ] Testado com "Reduzir animações".
+- [ ] Testado em pelo menos dois temas (um claro e Minas).
 
 ## Documentação
 
-- [ ] O README descreve o comportamento atual.
-- [ ] Os requisitos e limitações estão documentados.
-- [ ] As instruções de instalação foram conferidas.
-- [ ] As variáveis de ambiente estão descritas.
-- [ ] As rotas HTTP estão atualizadas.
-- [ ] Os diagramas correspondem à implementação.
-
-## Instalação e execução
-
-- [ ] Node.js 18 ou superior está instalado.
-- [ ] `npm install` é executado sem erros.
-- [ ] `npm start` inicia o servidor.
-- [ ] A página inicial abre em `/`.
-- [ ] A rota `/health` responde `ok`.
-
-## Funcionalidades
-
-- [ ] CPU e RAM são exibidas quando disponíveis.
-- [ ] Os volumes de armazenamento são apresentados.
-- [ ] A lista de processos é carregada.
-- [ ] Informações de rede são apresentadas quando disponíveis.
-- [ ] O histórico recebe amostras durante a execução.
-- [ ] É possível adicionar tarefas.
-- [ ] É possível concluir e reabrir tarefas.
-- [ ] É possível excluir tarefas.
-- [ ] Tarefas diárias têm seu estado reiniciado na mudança de data.
-
-## Qualidade e segurança
-
-- [ ] Não há credenciais ou tokens no repositório.
-- [ ] Arquivos locais e temporários foram removidos do commit.
-- [ ] Entradas do usuário são tratadas com segurança.
-- [ ] O diretório de dados possui permissões adequadas.
-- [ ] A exposição pública das métricas foi avaliada.
-- [ ] A interface foi conferida em telas menores.
-- [ ] Erros e limitações conhecidos foram documentados.
+- [ ] README e `docs/` refletem o comportamento atual.
+- [ ] Variáveis novas estão no `.env.example`.
+- [ ] Rotas novas estão em `docs/api.md`.
 
 ## Publicação
 
-- [ ] A branch e os commits possuem nomes descritivos.
-- [ ] A Pull Request explica as alterações.
-- [ ] As verificações foram executadas.
-- [ ] A configuração de hospedagem foi revisada.
-- [ ] A persistência de dados foi verificada no ambiente de produção.
+- [ ] CI verde (Linux, Windows, PostgreSQL, Docker).
+- [ ] `APP_SECRET` e `ADMIN_PASSWORD` definidos no ambiente de produção.
+- [ ] HTTPS na frente do servidor; agentes usando `https://`.
+- [ ] Backup do banco antes de atualizar.
