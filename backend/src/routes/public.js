@@ -10,7 +10,12 @@ export function publicRoutes() {
   const r = Router();
 
   // "app" permite ao aplicativo reconhecer uma instância já aberta e só abrir o navegador
-  r.get('/health', (_req, res) => res.json({ ok: true, app: 'stardew-monitor', uptimeSec: Math.round(process.uptime()) }));
+  r.get('/health', (_req, res) => {
+    // a página de download (ex.: site no Netlify) verifica se o aplicativo está aberto: só esta rota,
+    // sem dados sensíveis, pode ser lida por outra origem
+    res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+    res.json({ ok: true, app: 'stardew-monitor', uptimeSec: Math.round(process.uptime()) });
+  });
 
   return r;
 }

@@ -11,6 +11,7 @@ import { useRoute } from './services/router.js';
 import { setSoundPrefs } from './audio/sound.js';
 import { Toasts, Loading, ErrorBox, Panel, useNow } from './components/ui.jsx';
 import { MachinePicker } from './components/MachinePicker.jsx';
+import { HostedLanding } from './components/HostedLanding.jsx';
 import { FarmPage } from './pages/FarmPage.jsx';
 import { TownPage } from './pages/TownPage.jsx';
 import { HistoryPage } from './pages/HistoryPage.jsx';
@@ -42,9 +43,14 @@ export async function boot() {
     setState({ settings: r.settings, secrets: r.secrets || null, prefs, status: 'ready', selectedId: prefs.selectedMachine != null ? Number(prefs.selectedMachine) || null : null });
     setSoundPrefs(prefs);
   } catch (err) {
-    setState({ status: 'error', error: err.message });
+    // Página aberta fora do aplicativo (ex.: site no Netlify): não existe API ali.
+    setState({ status: isServedByApp() ? 'error' : 'hosted', error: err.message });
   }
 }
+
+const LOCAL_HOSTS = ['localhost', '127.0.0.1', '[::1]', '::1'];
+/** O painel só funciona quando é servido pelo próprio aplicativo, em localhost. */
+export const isServedByApp = () => LOCAL_HOSTS.includes(location.hostname);
 
 export async function loadSettings() {
   try {
@@ -140,6 +146,7 @@ export function App() {
   }, [theme, reducedMotion]);
 
   if (status === 'loading') return <div class="shell"><Loading text="Abrindo o portão da fazenda..." /></div>;
+  if (status === 'hosted') return <HostedLanding />;
   if (status === 'error') {
     return (
       <div class="shell">
