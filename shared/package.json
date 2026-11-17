@@ -1,0 +1,11 @@
+{
+  "name": "@stardew-monitor/shared",
+  "version": "3.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Regras compartilhadas: constantes, conversão de métricas em elementos da fazenda, estações, festivais, conquistas e mensagens.",
+  "exports": {
+    ".": "./src/index.js",
+    "./*": "./src/*.js"
+  }
+}

@@ -13,17 +13,18 @@ Obrigado pelo interesse em contribuir com o Stardew Monitor! Toda contribuição
 
 Requisitos:
 
-- Node.js 18 ou superior.
+- Node.js 22.13 ou superior.
 - npm.
 
 ```bash
 git clone https://github.com/Milkaarz/Stardew-Monitor.git
 cd Stardew-Monitor
 npm install
+npm run build
 npm start
 ```
 
-A aplicação deverá estar disponível em `http://localhost:3000`.
+A aplicação deverá estar disponível em `http://localhost:3001`. Para desenvolver a interface, rode também `npm run dev:web` (http://localhost:5173). Antes de abrir um PR, rode `npm run check`.
 
 ## Fluxo recomendado
 
@@ -48,7 +49,7 @@ A aplicação deverá estar disponível em `http://localhost:3000`.
 - Mantenha as responsabilidades de cada parte do sistema bem definidas.
 - Evite adicionar dependências sem necessidade.
 - Trate falhas de coleta de informações sem derrubar toda a aplicação.
-- Preserve a compatibilidade com Node.js 18 ou superior.
+- Preserve a compatibilidade com Node.js 22.13 ou superior, Windows e Linux.
 - Não inclua credenciais, dados pessoais ou informações específicas da sua máquina.
 
 ### Interface

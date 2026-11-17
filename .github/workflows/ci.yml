@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Lint, testes e build (${{ matrix.os }}, Node ${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            node: 22
+          - os: ubuntu-latest
+            node: 24
+          - os: windows-latest
+            node: 24
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - name: Instalar dependências
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Testes (SQLite)
+        run: npm test
+      - name: Build da interface
+        run: npm run build
+
+  postgres:
+    name: Testes com PostgreSQL
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: stardew
+          POSTGRES_PASSWORD: stardew
+          POSTGRES_DB: stardew_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U stardew"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgres://stardew:stardew@localhost:5432/stardew_test
+      API_TEST_PG: postgres://stardew:stardew@localhost:5432/stardew_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Persistência e API no PostgreSQL
+        run: npm run test:pg
+
+  docker:
+    name: Build da imagem Docker
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Servidor
+        run: docker build -t stardew-monitor:ci .
+      - name: Agente
+        run: docker build -f agent/Dockerfile -t stardew-agent:ci .
