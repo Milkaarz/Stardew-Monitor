@@ -6,7 +6,7 @@ Não é só ilustração: todos os números vêm de leituras reais **do computad
 
 > Projeto de fã, inspirado na estética de jogos de fazenda em pixel art. Toda a arte é original, desenhada em código (SVG); nenhum recurso de jogo é usado.
 
-- **🌐 Site:** [tubular-dieffenbachia-164159.netlify.app](https://tubular-dieffenbachia-164159.netlify.app/) — página de entrada: explica como funciona, leva ao download e, se o aplicativo já estiver aberto no seu computador, abre o seu painel.
+- **🌐 Site:** [stardewmonitor.netlify.app](https://stardewmonitor.netlify.app/) — página de entrada: explica como funciona, leva ao download e, se o aplicativo já estiver aberto no seu computador, abre o seu painel.
 - **⬇️ Download (Windows):** [StardewMonitor-windows-x64.exe](https://github.com/Milkaarz/Stardew-Monitor/raw/main/release/StardewMonitor-windows-x64.exe) · [pasta `release`](https://github.com/Milkaarz/Stardew-Monitor/tree/main/release)
 - **📍 Demo da versão 2 (modo agente + hospedagem PHP):** [mizzie.nyx.dev.br/stardew](https://mizzie.nyx.dev.br/stardew/)
 
