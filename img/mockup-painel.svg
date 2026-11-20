@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="620" viewBox="0 0 900 620" shape-rendering="crispEdges" font-family="Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+  <defs>
+    <symbol id="casa" viewBox="0 0 16 12">
+      <rect x="3" y="4" width="10" height="8" fill="#c89a5a"/>
+      <rect x="2" y="2" width="12" height="3" fill="#b3402a"/>
+      <rect x="4" y="0" width="8" height="2" fill="#c9503a"/>
+      <rect x="7" y="6" width="2" height="6" fill="#6b3a12"/>
+      <rect x="4" y="5" width="2" height="2" fill="#ffe27a"/>
+      <rect x="10" y="5" width="2" height="2" fill="#ffe27a"/>
+    </symbol>
+  </defs>
+  <rect width="900" height="620" fill="#2b2b2b"/>
+  <circle cx="24" cy="20" r="6" fill="#ef4444"/><circle cx="44" cy="20" r="6" fill="#f59e0b"/><circle cx="64" cy="20" r="6" fill="#22c55e"/>
+  <rect x="90" y="8" width="520" height="24" fill="#1c1c1c"/>
+  <text x="104" y="25" font-size="13" fill="#d1d5db">🏠 localhost:3001</text>
+  <rect y="40" width="900" height="580" fill="#5e3a18"/>
+
+  <rect y="40" width="900" height="48" fill="#8a5a2a"/>
+  <rect y="86" width="900" height="4" fill="#4a2f18"/>
+  <text x="16" y="71" font-family="'Press Start 2P', 'Courier New', monospace" font-size="15" font-weight="900" fill="#fff3d6">STARDEW MONITOR</text>
+  <g font-size="11" font-weight="700" text-anchor="middle">
+    <rect x="232" y="52" width="80" height="26" fill="#f6e7c1"/><text x="272" y="69" fill="#3b2412">🏡 Fazenda</text>
+    <g fill="#fff3d6"><text x="356" y="69">🏘️ Town</text><text x="436" y="69">📈 Histórico</text><text x="526" y="69">🧑‍🌾 Moradores</text><text x="612" y="69">📖 Diário</text><text x="684" y="69">📜 Missões</text><text x="760" y="69">🔔 Avisos</text><text x="840" y="69">⚙️ Ajustes</text></g>
+  </g>
+
+  <rect x="12" y="98" width="876" height="30" fill="#f6e7c1" stroke="#4a2f18" stroke-width="3"/>
+  <text x="26" y="118" font-size="13" font-weight="700" fill="#3b2412">🌾 Fazenda Principal · 🌸 Primavera, dia 12 · ☀️ Ensolarado (Sistema ocioso) · 🟢 Tudo certo · atualizado há 2 s</text>
+
+  <g>
+    <rect x="12" y="138" width="584" height="372" fill="#4a2f18"/>
+    <rect x="16" y="142" width="576" height="70" fill="#4fa3e0"/>
+    <rect x="16" y="212" width="576" height="70" fill="#7cc4ec"/>
+    <rect x="16" y="282" width="576" height="40" fill="#a8dcf5"/>
+    <g fill="#ffe27a"><rect x="520" y="160" width="36" height="36"/></g>
+    <g fill="#ffffff"><rect x="80" y="170" width="70" height="14"/><rect x="94" y="160" width="36" height="10"/><rect x="330" y="200" width="60" height="12"/></g>
+    <g fill="#6a9cc2"><rect x="16" y="300" width="200" height="30"/><rect x="380" y="292" width="212" height="38"/></g>
+    <rect x="16" y="322" width="576" height="184" fill="#5cbf4a"/>
+    <rect x="16" y="322" width="576" height="5" fill="#8be36a"/>
+    <rect x="16" y="404" width="576" height="18" fill="#c9a36a"/>
+
+    <use href="#casa" x="34" y="232" width="144" height="108"/>
+    <g fill="#cfd4da"><rect x="150" y="226" width="10" height="10"/><rect x="158" y="212" width="12" height="12"/></g>
+
+    <rect x="200" y="340" width="168" height="56" fill="#8a5a2a"/>
+    <g fill="#3fae49">
+      <rect x="208" y="348" width="10" height="10"/><rect x="236" y="348" width="10" height="10"/><rect x="264" y="348" width="10" height="10"/><rect x="292" y="348" width="10" height="10"/><rect x="320" y="348" width="10" height="10"/><rect x="348" y="348" width="10" height="10"/>
+      <rect x="208" y="376" width="10" height="10"/><rect x="236" y="376" width="10" height="10"/><rect x="264" y="376" width="10" height="10"/>
+    </g>
+    <g fill="#f5f5f5"><rect x="210" y="344" width="6" height="6"/><rect x="266" y="344" width="6" height="6"/><rect x="322" y="344" width="6" height="6"/></g>
+
+    <g>
+      <rect x="404" y="252" width="40" height="88" fill="#c9cdd2"/><rect x="404" y="306" width="40" height="34" fill="#ffd23f"/><rect x="400" y="242" width="48" height="12" fill="#b3402a"/>
+      <rect x="452" y="262" width="34" height="78" fill="#c9cdd2"/><rect x="452" y="318" width="34" height="22" fill="#ffd23f"/><rect x="448" y="252" width="42" height="12" fill="#b3402a"/>
+    </g>
+    <g>
+      <rect x="520" y="262" width="26" height="78" fill="#e9d394"/>
+      <rect x="531" y="230" width="4" height="64" fill="#f5f5f5"/><rect x="501" y="260" width="64" height="4" fill="#f5f5f5"/>
+      <rect x="529" y="258" width="8" height="8" fill="#6b4a2a"/>
+    </g>
+
+    <g>
+      <rect x="250" y="394" width="56" height="20" fill="#b8691c"/><rect x="250" y="390" width="56" height="4" fill="#6b4a2a"/>
+      <rect x="254" y="412" width="12" height="12" fill="#4a2f18"/><rect x="290" y="412" width="12" height="12" fill="#4a2f18"/>
+      <rect x="306" y="380" width="4" height="20" fill="#4a2f18"/><rect x="310" y="380" width="14" height="10" fill="#d9381e"/>
+    </g>
+
+    <g fill="#ffffff"><rect x="60" y="448" width="16" height="12"/><rect x="96" y="456" width="16" height="12"/><rect x="132" y="446" width="16" height="12"/></g>
+    <g fill="#d9381e"><rect x="68" y="444" width="6" height="4"/><rect x="104" y="452" width="6" height="4"/><rect x="140" y="442" width="6" height="4"/></g>
+    <rect x="420" y="440" width="140" height="48" fill="#3a8fd8"/><rect x="420" y="440" width="140" height="6" fill="#8fd0f0"/>
+    <g fill="#ffd23f"><rect x="450" y="460" width="14" height="10"/><rect x="500" y="466" width="14" height="10"/></g>
+
+    <g font-size="11" font-weight="800">
+      <rect x="62" y="216" width="96" height="20" fill="#f6e7c1" stroke="#4a2f18" stroke-width="2"/><text x="110" y="230" fill="#3b2412" text-anchor="middle">⚡ CPU 12%</text>
+      <rect x="236" y="314" width="96" height="20" fill="#f6e7c1" stroke="#4a2f18" stroke-width="2"/><text x="284" y="328" fill="#3b2412" text-anchor="middle">🌱 RAM 38%</text>
+      <rect x="396" y="218" width="96" height="20" fill="#f6e7c1" stroke="#4a2f18" stroke-width="2"/><text x="444" y="232" fill="#3b2412" text-anchor="middle">💽 C: 45%</text>
+      <rect x="500" y="204" width="86" height="20" fill="#f6e7c1" stroke="#4a2f18" stroke-width="2"/><text x="543" y="218" fill="#3b2412" text-anchor="middle">🎮 GPU 8%</text>
+      <rect x="230" y="430" width="104" height="20" fill="#f6e7c1" stroke="#4a2f18" stroke-width="2"/><text x="282" y="444" fill="#3b2412" text-anchor="middle">📶 ↓ 320 KB/s</text>
+    </g>
+  </g>
+
+  <g>
+    <rect x="606" y="138" width="282" height="236" fill="#4a2f18"/><rect x="610" y="142" width="274" height="228" fill="#f6e7c1"/>
+    <rect x="610" y="142" width="274" height="30" fill="#c9a36a"/>
+    <text x="624" y="163" font-size="14" font-weight="800" fill="#3b2412">📊 Recursos</text>
+    <g font-size="12" font-weight="700" fill="#3b2412">
+      <text x="624" y="194">⚡ CPU</text><text x="870" y="194" text-anchor="end">12%</text>
+      <rect x="624" y="200" width="246" height="8" fill="#e4d3a8"/><rect x="624" y="200" width="30" height="8" fill="#4caf50"/>
+      <text x="624" y="226">🌱 RAM</text><text x="870" y="226" text-anchor="end">38%</text>
+      <rect x="624" y="232" width="246" height="8" fill="#e4d3a8"/><rect x="624" y="232" width="93" height="8" fill="#4caf50"/>
+      <text x="624" y="258">💽 Disco C:</text><text x="870" y="258" text-anchor="end">45%</text>
+      <rect x="624" y="264" width="246" height="8" fill="#e4d3a8"/><rect x="624" y="264" width="111" height="8" fill="#4caf50"/>
+      <text x="624" y="290">🎮 GPU</text><text x="870" y="290" text-anchor="end">8%</text>
+      <rect x="624" y="296" width="246" height="8" fill="#e4d3a8"/><rect x="624" y="296" width="20" height="8" fill="#4caf50"/>
+      <text x="624" y="322">🌡️ Temperatura</text><text x="870" y="322" text-anchor="end">54 °C</text>
+      <rect x="624" y="328" width="246" height="8" fill="#e4d3a8"/><rect x="624" y="328" width="133" height="8" fill="#ffd23f"/>
+      <text x="624" y="356" fill="#7a6a5a">🔋 Bateria</text><text x="870" y="356" text-anchor="end" fill="#7a6a5a">indisponível</text>
+    </g>
+  </g>
+  <g>
+    <rect x="606" y="384" width="282" height="60" fill="#4a2f18"/><rect x="610" y="388" width="274" height="52" fill="#f6e7c1"/>
+    <text x="624" y="410" font-size="13" font-weight="800" fill="#3b2412">💬 Recado da fazenda</text>
+    <text x="624" y="430" font-size="12.5" fill="#5e3a18">Os moradores estão felizes!</text>
+  </g>
+  <g>
+    <rect x="606" y="452" width="282" height="58" fill="#4a2f18"/><rect x="610" y="456" width="274" height="50" fill="#fff3c4"/>
+    <text x="624" y="477" font-size="13" font-weight="800" fill="#3b2412">🏆 Conquista desbloqueada!</text>
+    <text x="624" y="496" font-size="12.5" fill="#5e3a18">Fazendeiro Dedicado</text>
+  </g>
+
+  <rect x="12" y="520" width="876" height="88" fill="#4a2f18"/>
+  <rect x="16" y="524" width="430" height="80" fill="#f6e7c1"/>
+  <text x="30" y="546" font-size="13" font-weight="800" fill="#3b2412">📜 Quadro de Missões</text>
+  <text x="30" y="568" font-size="12.5" fill="#5e3a18">☑ Limpar os filtros de poeira</text>
+  <text x="30" y="588" font-size="12.5" fill="#5e3a18">☐ Atualizar os drivers da GPU (diária)</text>
+  <rect x="454" y="524" width="430" height="80" fill="#f6e7c1"/>
+  <text x="468" y="546" font-size="13" font-weight="800" fill="#3b2412">🔔 Último aviso</text>
+  <text x="468" y="568" font-size="12.5" fill="#5e3a18">🟢 RAM voltou ao normal (recuperação)</text>
+  <text x="468" y="588" font-size="12.5" fill="#5e3a18">enviado por Discord · há 14 min</text>
+</svg>

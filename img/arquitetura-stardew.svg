@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="560" viewBox="0 0 900 560" font-family="Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#4a2f18"/></marker>
+  </defs>
+  <rect width="900" height="560" fill="#bfe6ff"/>
+  <rect y="430" width="900" height="130" fill="#7ad35a"/>
+
+  <g shape-rendering="crispEdges">
+    <rect x="20" y="16" width="290" height="66" fill="#4a2f18"/><rect x="24" y="20" width="282" height="58" fill="#e6fffa"/>
+    <text x="165" y="44" font-size="15" font-weight="800" fill="#115e59" text-anchor="middle">☁️ Netlify: página de entrada</text>
+    <text x="165" y="65" font-size="12" fill="#115e59" text-anchor="middle">só a interface, sem servidor e sem dados</text>
+    <rect x="590" y="16" width="290" height="66" fill="#4a2f18"/><rect x="594" y="20" width="282" height="58" fill="#f3f4f6"/>
+    <text x="735" y="44" font-size="15" font-weight="800" fill="#1f2933" text-anchor="middle">🐙 GitHub: pasta release/</text>
+    <text x="735" y="65" font-size="12" fill="#1f2933" text-anchor="middle">StardewMonitor-windows-x64.exe</text>
+  </g>
+
+  <rect x="20" y="110" width="860" height="304" fill="#4a2f18" shape-rendering="crispEdges"/>
+  <rect x="26" y="116" width="848" height="292" fill="#f6e7c1" shape-rendering="crispEdges"/>
+  <text x="190" y="142" font-size="16" font-weight="800" fill="#3b2412">🖥️ Seu computador</text>
+  <text x="470" y="142" font-size="12" fill="#5e3a18">executável único = Node.js + servidor + interface</text>
+
+  <g shape-rendering="crispEdges">
+    <rect x="44" y="164" width="210" height="130" fill="#eff6ff" stroke="#2563eb" stroke-width="3"/>
+    <text x="149" y="190" font-size="15" font-weight="800" fill="#1e40af" text-anchor="middle">🧭 Navegador</text>
+    <g font-size="12.5" fill="#1f2933"><text x="60" y="216">• Frontend Preact + Vite</text><text x="60" y="238">• Fazenda em SVG animado</text><text x="60" y="260">• Gráficos e sons 8 bits</text><text x="60" y="282">• http://localhost:3001</text></g>
+
+    <rect x="324" y="164" width="250" height="226" fill="#fff7ed" stroke="#ea580c" stroke-width="3"/>
+    <text x="449" y="190" font-size="15" font-weight="800" fill="#9a3412" text-anchor="middle">⚙️ Backend (Express)</text>
+    <g font-size="12.5" fill="#1f2933"><text x="340" y="218">• API REST em /api</text><text x="340" y="242">• Tempo real: SSE /api/stream</text><text x="340" y="266">• IngestService (ingestão)</text><text x="340" y="290">• Alertas, conquistas, festivais</text><text x="340" y="314">• Agregação e retenção</text><text x="340" y="338">• Proteção local: 127.0.0.1,</text><text x="352" y="358">anti-CSRF, rate limit, zod</text></g>
+
+    <rect x="644" y="164" width="210" height="100" fill="#f5f3ff" stroke="#7c3aed" stroke-width="3"/>
+    <text x="749" y="190" font-size="15" font-weight="800" fill="#5b21b6" text-anchor="middle">🔍 Coletor (agent/)</text>
+    <g font-size="12.5" fill="#1f2933"><text x="660" y="216">• systeminformation</text><text x="660" y="238">• CPU, RAM, discos, rede,</text><text x="672" y="256">GPU, ventoinhas, bateria</text></g>
+  </g>
+
+  <ellipse cx="749" cy="304" rx="96" ry="14" fill="#dcfce7" stroke="#16a34a" stroke-width="3"/>
+  <path d="M653 304v76a96 14 0 0 0 192 0V304" fill="#dcfce7" stroke="#16a34a" stroke-width="3"/>
+  <ellipse cx="749" cy="304" rx="96" ry="14" fill="#bbf7d0" stroke="#16a34a" stroke-width="3"/>
+  <text x="749" y="340" font-size="14" font-weight="800" fill="#166534" text-anchor="middle">🗄️ SQLite (node:sqlite)</text>
+  <text x="749" y="362" font-size="12" fill="#166534" text-anchor="middle">ou PostgreSQL · migrations</text>
+
+  <g stroke="#4a2f18" stroke-width="2.5" fill="none">
+    <line x1="644" y1="214" x2="580" y2="214" marker-end="url(#a)"/>
+    <line x1="574" y1="330" x2="649" y2="330" marker-start="url(#a)" marker-end="url(#a)"/>
+    <line x1="324" y1="214" x2="260" y2="214" marker-end="url(#a)"/>
+    <line x1="254" y1="266" x2="318" y2="266" marker-end="url(#a)"/>
+    <path d="M165 82V160" stroke-dasharray="6 5" marker-end="url(#a)"/>
+    <path d="M735 82V100H449V158" marker-end="url(#a)"/>
+    <path d="M230 470V420H360V396" marker-end="url(#a)"/>
+    <path d="M540 396V420H670V464" marker-end="url(#a)"/>
+  </g>
+  <g font-size="11.5" font-weight="700" fill="#4a2f18">
+    <text x="582" y="206">snapshot</text>
+    <text x="582" y="232">a cada 5 s</text>
+    <text x="268" y="206">SSE</text>
+    <text x="268" y="284">REST</text>
+    <text x="174" y="104">verifica localhost:3001–3005</text>
+    <text x="586" y="96">⬇️ download do .exe</text>
+  </g>
+
+  <g shape-rendering="crispEdges">
+    <rect x="40" y="470" width="380" height="74" fill="#4a2f18"/><rect x="44" y="474" width="372" height="66" fill="#f6e7c1"/>
+    <text x="230" y="500" font-size="14" font-weight="800" fill="#3b2412" text-anchor="middle">🏘️ Outras máquinas da rede (opcional)</text>
+    <text x="230" y="524" font-size="12" fill="#5e3a18" text-anchor="middle">agente + token individual + assinatura HMAC-SHA256</text>
+    <rect x="480" y="464" width="380" height="80" fill="#4a2f18"/><rect x="484" y="468" width="372" height="72" fill="#f6e7c1"/>
+    <text x="670" y="496" font-size="14" font-weight="800" fill="#3b2412" text-anchor="middle">📣 Notificações (opcional)</text>
+    <text x="670" y="520" font-size="12" fill="#5e3a18" text-anchor="middle">💬 Discord · ✈️ Telegram · ✉️ E-mail (SMTP)</text>
+  </g>
+</svg>

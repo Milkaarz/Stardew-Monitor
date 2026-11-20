@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="270" viewBox="0 0 900 270" shape-rendering="crispEdges" font-family="Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+  <rect width="900" height="200" fill="#8fd0f0"/>
+  <rect width="900" height="70" fill="#6dbbe8"/>
+  <rect y="200" width="900" height="70" fill="#4caf50"/>
+  <rect y="200" width="900" height="6" fill="#7ad35a"/>
+  <rect y="222" width="900" height="18" fill="#c9a36a"/>
+  <text x="450" y="34" font-family="'Press Start 2P', 'Courier New', monospace" font-size="18" font-weight="900" fill="#3b2412" text-anchor="middle">🗺️ COMO USAR EM 5 PASSOS</text>
+  <g fill="#4a2f18">
+    <rect x="96" y="176" width="12" height="52"/><rect x="270" y="176" width="12" height="52"/><rect x="444" y="176" width="12" height="52"/><rect x="618" y="176" width="12" height="52"/><rect x="792" y="176" width="12" height="52"/>
+  </g>
+  <g text-anchor="middle">
+    <g transform="translate(22,56)">
+      <rect width="160" height="124" fill="#4a2f18"/><rect x="5" y="5" width="150" height="114" fill="#f6e7c1"/>
+      <text x="80" y="26" font-size="12" font-weight="800" fill="#8a5a2a">PASSO 1</text>
+      <text x="80" y="62" font-size="32">🌐</text>
+      <text x="80" y="88" font-size="14" font-weight="800" fill="#3b2412">Abrir o site</text>
+      <text x="80" y="107" font-size="10.5" fill="#5e3a18">stardewmonitor.netlify.app</text>
+    </g>
+    <g transform="translate(196,56)">
+      <rect width="160" height="124" fill="#4a2f18"/><rect x="5" y="5" width="150" height="114" fill="#f6e7c1"/>
+      <text x="80" y="26" font-size="12" font-weight="800" fill="#8a5a2a">PASSO 2</text>
+      <text x="80" y="62" font-size="32">⬇️</text>
+      <text x="80" y="88" font-size="14" font-weight="800" fill="#3b2412">Baixar o .exe</text>
+      <text x="80" y="107" font-size="10.5" fill="#5e3a18">pasta release no GitHub</text>
+    </g>
+    <g transform="translate(370,56)">
+      <rect width="160" height="124" fill="#4a2f18"/><rect x="5" y="5" width="150" height="114" fill="#f6e7c1"/>
+      <text x="80" y="26" font-size="12" font-weight="800" fill="#8a5a2a">PASSO 3</text>
+      <text x="80" y="62" font-size="32">🖱️</text>
+      <text x="80" y="88" font-size="14" font-weight="800" fill="#3b2412">Dois cliques</text>
+      <text x="80" y="107" font-size="10.5" fill="#5e3a18">sem instalar nada</text>
+    </g>
+    <g transform="translate(544,56)">
+      <rect width="160" height="124" fill="#4a2f18"/><rect x="5" y="5" width="150" height="114" fill="#f6e7c1"/>
+      <text x="80" y="26" font-size="12" font-weight="800" fill="#8a5a2a">PASSO 4</text>
+      <text x="80" y="62" font-size="32">🧭</text>
+      <text x="80" y="88" font-size="14" font-weight="800" fill="#3b2412">Navegador abre</text>
+      <text x="80" y="107" font-size="10.5" fill="#5e3a18">localhost:3001</text>
+    </g>
+    <g transform="translate(718,56)">
+      <rect width="160" height="124" fill="#4a2f18"/><rect x="5" y="5" width="150" height="114" fill="#f6e7c1"/>
+      <text x="80" y="26" font-size="12" font-weight="800" fill="#8a5a2a">PASSO 5</text>
+      <text x="80" y="62" font-size="32">🌾</text>
+      <text x="80" y="88" font-size="14" font-weight="800" fill="#3b2412">Fazenda ao vivo</text>
+      <text x="80" y="107" font-size="10.5" fill="#5e3a18">dados reais deste PC</text>
+    </g>
+  </g>
+  <g fill="#4a2f18">
+    <polygon points="195,118 183,110 183,126"/><polygon points="369,118 357,110 357,126"/><polygon points="543,118 531,110 531,126"/><polygon points="717,118 705,110 705,126"/>
+  </g>
+  <text x="450" y="258" font-size="13" font-weight="700" fill="#3b2412" text-anchor="middle">🔒 Sem login, sem conta e sem servidor na internet: os dados nunca saem do computador</text>
+</svg>

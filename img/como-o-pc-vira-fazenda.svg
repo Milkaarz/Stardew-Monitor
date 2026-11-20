@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="580" viewBox="0 0 900 580" shape-rendering="crispEdges" font-family="Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+  <rect width="900" height="580" fill="#4a2f18"/>
+  <rect x="8" y="8" width="884" height="564" fill="#8a5a2a"/>
+  <g fill="#7a4e22"><rect x="8" y="120" width="884" height="4"/><rect x="8" y="240" width="884" height="4"/><rect x="8" y="360" width="884" height="4"/><rect x="8" y="480" width="884" height="4"/></g>
+  <text x="450" y="50" font-family="'Press Start 2P', 'Courier New', monospace" font-size="22" font-weight="900" fill="#fff3d6" text-anchor="middle">🧑‍🌾 COMO O PC VIRA FAZENDA</text>
+  <text x="450" y="76" font-size="14" fill="#f6e7c1" text-anchor="middle">Cada recurso real do computador vira um elemento da cena (os números continuam visíveis)</text>
+
+  <g font-size="13" fill="#5e3a18">
+    <g transform="translate(24,92)">
+      <rect width="420" height="84" fill="#f6e7c1" stroke="#4a2f18" stroke-width="4"/>
+      <text x="16" y="34" font-size="19" font-weight="800" fill="#3b2412">⚡ CPU  ➜  🏠 Casa</text>
+      <text x="16" y="60">Fumaça da chaminé: 0 a 3 (≥15%, ≥45%, ≥75% de uso)</text>
+    </g>
+    <g transform="translate(456,92)">
+      <rect width="420" height="84" fill="#f6e7c1" stroke="#4a2f18" stroke-width="4"/>
+      <text x="16" y="34" font-size="19" font-weight="800" fill="#3b2412">🧠 RAM  ➜  🌱 Plantação</text>
+      <text x="16" y="60">24 canteiros, ocupados conforme o % de memória</text>
+    </g>
+    <g transform="translate(24,188)">
+      <rect width="420" height="84" fill="#f6e7c1" stroke="#4a2f18" stroke-width="4"/>
+      <text x="16" y="34" font-size="19" font-weight="800" fill="#3b2412">💽 Discos  ➜  🏚️ Celeiro e silos</text>
+      <text x="16" y="60">Grãos sobem com o espaço usado em cada disco</text>
+    </g>
+    <g transform="translate(456,188)">
+      <rect width="420" height="84" fill="#f6e7c1" stroke="#4a2f18" stroke-width="4"/>
+      <text x="16" y="34" font-size="19" font-weight="800" fill="#3b2412">📶 Rede  ➜  🛒 Carroça e correio</text>
+      <text x="16" y="60">Velocidade pelo tráfego; bandeira sobe no envio forte</text>
+    </g>
+    <g transform="translate(24,284)">
+      <rect width="420" height="84" fill="#f6e7c1" stroke="#4a2f18" stroke-width="4"/>
+      <text x="16" y="34" font-size="19" font-weight="800" fill="#3b2412">🎮 GPU  ➜  🌬️ Moinho</text>
+      <text x="16" y="60">Pás giram mais rápido com o uso (≥5%, ≥35%, ≥75%)</text>
+    </g>
+    <g transform="translate(456,284)">
+      <rect width="420" height="84" fill="#f6e7c1" stroke="#4a2f18" stroke-width="4"/>
+      <text x="16" y="34" font-size="19" font-weight="800" fill="#3b2412">🌡️ Carga e temperatura  ➜  ⛅ Clima</text>
+      <text x="16" y="60">Sol, nublado, chuva, tempestade, calor e onda de calor</text>
+    </g>
+    <g transform="translate(24,380)">
+      <rect width="420" height="84" fill="#f6e7c1" stroke="#4a2f18" stroke-width="4"/>
+      <text x="16" y="34" font-size="19" font-weight="800" fill="#3b2412">🌀 Ventoinhas  ➜  🍃 Vento</text>
+      <text x="16" y="60">Intensidade pelo maior RPM (forte a partir de 1500 RPM)</text>
+    </g>
+    <g transform="translate(456,380)">
+      <rect width="420" height="84" fill="#f6e7c1" stroke="#4a2f18" stroke-width="4"/>
+      <text x="16" y="34" font-size="19" font-weight="800" fill="#3b2412">🔋 Bateria  ➜  💪 Estamina</text>
+      <text x="16" y="60">Carregando, na tomada ou descarregando</text>
+    </g>
+    <g transform="translate(24,476)">
+      <rect width="420" height="84" fill="#f6e7c1" stroke="#4a2f18" stroke-width="4"/>
+      <text x="16" y="34" font-size="19" font-weight="800" fill="#3b2412">⏱️ Tempo ligado  ➜  📅 Dias na fazenda</text>
+      <text x="16" y="60">Uptime e tempo acumulado de monitoramento</text>
+    </g>
+    <g transform="translate(456,476)">
+      <rect width="420" height="84" fill="#f6e7c1" stroke="#4a2f18" stroke-width="4"/>
+      <text x="16" y="34" font-size="19" font-weight="800" fill="#3b2412">❤️ Saúde geral  ➜  🐔 Animais</text>
+      <text x="16" y="60">Galinhas felizes/assustadas, vacas, porcos e patos</text>
+    </g>
+  </g>
+</svg>

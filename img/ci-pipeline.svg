@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="290" viewBox="0 0 900 290" font-family="Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#4a2f18"/></marker>
+  </defs>
+  <rect width="900" height="290" fill="#f6e7c1"/>
+  <text x="450" y="28" font-family="'Press Start 2P', 'Courier New', monospace" font-size="15" font-weight="900" fill="#3b2412" text-anchor="middle">⚙️ GITHUB ACTIONS · ci.yml</text>
+
+  <g stroke="#4a2f18" stroke-width="2.5" fill="none" marker-end="url(#a)">
+    <path d="M150 150H166V100H182"/>
+    <path d="M150 150H166V214H182"/>
+    <path d="M412 92H446"/>
+    <path d="M412 112H430V180H446"/>
+    <path d="M662 180H696"/>
+  </g>
+
+  <g shape-rendering="crispEdges">
+    <rect x="14" y="112" width="136" height="76" fill="#1f2933"/>
+    <text x="82" y="140" font-size="14" font-weight="800" fill="#ffffff" text-anchor="middle">🚦 Gatilho</text>
+    <text x="82" y="160" font-size="11.5" fill="#d1d5db" text-anchor="middle">push na main</text>
+    <text x="82" y="176" font-size="11.5" fill="#d1d5db" text-anchor="middle">pull request · tag v*</text>
+
+    <rect x="186" y="44" width="226" height="118" fill="#eff6ff" stroke="#2563eb" stroke-width="3"/>
+    <text x="299" y="68" font-size="14" font-weight="800" fill="#1e40af" text-anchor="middle">🧪 test (matriz)</text>
+    <text x="200" y="90" font-size="11.5" fill="#1f2933">🐧 Ubuntu · Node 22 e 24</text>
+    <text x="200" y="108" font-size="11.5" fill="#1f2933">💻 Windows · Node 24</text>
+    <text x="200" y="132" font-size="11.5" font-weight="700" fill="#1f2933">npm ci → lint → test → build</text>
+
+    <rect x="186" y="176" width="226" height="80" fill="#e6fffa" stroke="#0d9488" stroke-width="3"/>
+    <text x="299" y="200" font-size="14" font-weight="800" fill="#115e59" text-anchor="middle">🐘 postgres</text>
+    <text x="299" y="222" font-size="11.5" fill="#1f2933" text-anchor="middle">PostgreSQL 17 como serviço</text>
+    <text x="299" y="240" font-size="11.5" fill="#1f2933" text-anchor="middle">npm run test:pg</text>
+
+    <rect x="450" y="50" width="212" height="84" fill="#f0f9ff" stroke="#0284c7" stroke-width="3"/>
+    <text x="556" y="74" font-size="14" font-weight="800" fill="#075985" text-anchor="middle">🐳 docker</text>
+    <text x="556" y="96" font-size="11.5" fill="#1f2933" text-anchor="middle">build da imagem do servidor</text>
+    <text x="556" y="114" font-size="11.5" fill="#1f2933" text-anchor="middle">e da imagem do agente</text>
+
+    <rect x="450" y="146" width="212" height="110" fill="#fff7ed" stroke="#ea580c" stroke-width="3"/>
+    <text x="556" y="170" font-size="14" font-weight="800" fill="#9a3412" text-anchor="middle">📦 app</text>
+    <text x="556" y="192" font-size="11.5" fill="#1f2933" text-anchor="middle">gera o executável</text>
+    <text x="556" y="210" font-size="11.5" fill="#1f2933" text-anchor="middle">Windows e Linux</text>
+    <text x="556" y="232" font-size="11.5" fill="#1f2933" text-anchor="middle">smoke test: /api/health ✔</text>
+
+    <rect x="700" y="146" width="186" height="110" fill="#f0fdf4" stroke="#16a34a" stroke-width="3"/>
+    <text x="793" y="170" font-size="14" font-weight="800" fill="#166534" text-anchor="middle">🚀 release</text>
+    <text x="793" y="192" font-size="11.5" fill="#1f2933" text-anchor="middle">só em tags v*</text>
+    <text x="793" y="210" font-size="11.5" fill="#1f2933" text-anchor="middle">cria a Release no GitHub</text>
+    <text x="793" y="228" font-size="11.5" fill="#1f2933" text-anchor="middle">com os executáveis</text>
+  </g>
+  <text x="450" y="280" font-size="12" fill="#5e3a18" text-anchor="middle">docker e app dependem de test · release depende de app · postgres roda em paralelo</text>
+</svg>

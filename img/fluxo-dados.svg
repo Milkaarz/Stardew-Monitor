@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="220" viewBox="0 0 900 220" font-family="Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#f6e7c1"/></marker>
+  </defs>
+  <rect width="900" height="220" fill="#4a2f18"/>
+  <g stroke="#f6e7c1" stroke-width="3" marker-end="url(#a)">
+    <line x1="139" y1="86" x2="157" y2="86"/><line x1="289" y1="86" x2="307" y2="86"/><line x1="439" y1="86" x2="457" y2="86"/><line x1="589" y1="86" x2="607" y2="86"/><line x1="739" y1="86" x2="757" y2="86"/>
+  </g>
+  <g text-anchor="middle" font-size="12" fill="#5e3a18" shape-rendering="crispEdges">
+    <rect x="11" y="20" width="128" height="132" fill="#f6e7c1"/><rect x="11" y="20" width="128" height="8" fill="#7c3aed"/>
+    <text x="75" y="64" font-size="28">🔍</text><text x="75" y="92" font-size="14" font-weight="800" fill="#3b2412">Coleta</text><text x="75" y="114">a cada 5 s, em</text><text x="75" y="130">camadas</text>
+    <rect x="161" y="20" width="128" height="132" fill="#f6e7c1"/><rect x="161" y="20" width="128" height="8" fill="#ea580c"/>
+    <text x="225" y="64" font-size="28">📥</text><text x="225" y="92" font-size="14" font-weight="800" fill="#3b2412">Ingestão</text><text x="225" y="114">grava a leitura</text><text x="225" y="130">bruta no banco</text>
+    <rect x="311" y="20" width="128" height="132" fill="#f6e7c1"/><rect x="311" y="20" width="128" height="8" fill="#d9381e"/>
+    <text x="375" y="64" font-size="28">🚨</text><text x="375" y="92" font-size="14" font-weight="800" fill="#3b2412">Alertas</text><text x="375" y="114">e conquistas</text><text x="375" y="130">avaliados</text>
+    <rect x="461" y="20" width="128" height="132" fill="#f6e7c1"/><rect x="461" y="20" width="128" height="8" fill="#2563eb"/>
+    <text x="525" y="64" font-size="28">📡</text><text x="525" y="92" font-size="14" font-weight="800" fill="#3b2412">SSE</text><text x="525" y="114">/api/stream</text><text x="525" y="130">empurra ao vivo</text>
+    <rect x="611" y="20" width="128" height="132" fill="#f6e7c1"/><rect x="611" y="20" width="128" height="8" fill="#ca8a04"/>
+    <text x="675" y="64" font-size="28">🧮</text><text x="675" y="92" font-size="13" font-weight="800" fill="#3b2412">computeFarm</text><text x="675" y="114">State (shared):</text><text x="675" y="130">métricas → cena</text>
+    <rect x="761" y="20" width="128" height="132" fill="#f6e7c1"/><rect x="761" y="20" width="128" height="8" fill="#4caf50"/>
+    <text x="825" y="64" font-size="28">🌾</text><text x="825" y="92" font-size="14" font-weight="800" fill="#3b2412">Fazenda</text><text x="825" y="114">SVG animado</text><text x="825" y="130">no navegador</text>
+  </g>
+  <text x="450" y="180" font-size="12.5" fill="#f6e7c1" text-anchor="middle">⏲️ A cada minuto: agregação (média e máximo por minuto e por hora)</text>
+  <text x="450" y="202" font-size="12.5" fill="#f6e7c1" text-anchor="middle">🧹 A cada hora: retenção (leituras brutas 26 h · minutos 8 dias · horas 400 dias)</text>
+</svg>
