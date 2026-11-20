@@ -17,7 +17,7 @@
   <img src="https://img.shields.io/badge/licença-MIT-4caf50?style=for-the-badge" alt="Licença MIT">
 </p>
 
-# 🌾 Stardew Monitor: monitor de hardware em pixel art 🖥️
+# 🌾 Stardew Monitor: Seu monitor Rural! 🖥️
 
 Monitor de hardware e recursos do sistema com **visual de fazenda em pixel art** 🧑‍🌾. Cada recurso real do computador vira um elemento da fazenda: a 🏠 **casa** é a CPU, a 🌱 **plantação** é a RAM, os 🏚️ **silos** são os discos, a 🛒 **carroça** é a rede, o 🌬️ **moinho** é a GPU, o ⛅ **clima** reage à carga e à temperatura, a 💪 **estamina** é a bateria e os 📅 **dias na fazenda** são o tempo ligado.
 
